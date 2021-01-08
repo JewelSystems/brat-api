@@ -62,7 +62,19 @@ let User = sequelize.define('User', {
   sequelize,
   timestamps: false,
   modelName: 'User',
-  tableName: 'users'
+  tableName: 'users',
+  hooks:{
+    beforeCreate: async user => {
+      let passwordData = await salt(user.password);
+      console.log(passwordData);
+
+      user.password = passwordData.passwordHash;
+      user.salt = passwordData.salt;
+      user.status = 'PendingEmail';
+      user.created = moment().unix();
+      user.updated = moment().unix();
+    }
+  }
 });
 
 User.salt = async function(password) {
@@ -85,94 +97,6 @@ User.login = async function(username, password) {
   hash.update(password);
   let value = hash.digest('hex');
   if (value == userFound.password) return true;
-  return false;
-};
-
-User.signup = async function(first_name, last_name, username, email, password, gender, birthday, phone_number, stream_link, twitch, twitter, facebook, instagram, youtube) {
-  let passwordData = await this.salt(password);
-
-  let createUser = await User.create({
-    first_name: first_name,
-    last_name: last_name,
-    username: username,
-    email: email,
-    password: passwordData.passwordHash,
-    salt: passwordData.salt,
-    gender: gender,
-    phone_number: phone_number,
-    stream_link: stream_link,
-    twitch: twitch,
-    twitter: twitter,
-    facebook: facebook,
-    instagram: instagram,
-    youtube: youtube,
-    status: 'PendingEmail',
-    reset_token: 1,
-    created: moment().unix(),
-    updated: moment().unix(),
-  });
-
-  if (createUser) return createUser;
-  return false;
-};
-
-User.get = async function(id) {
-  let user = await User.findOne({where:{id}});
-  
-  if (user) return user;
-  return false;
-};
-
-User.update = async function(id, first_name, last_name, username, email, password, gender, birthday, phone_number, stream_link, twitch, twitter, facebook, instagram, youtube) {
-  let passwordData = await this.salt(password);
-  await User.update({
-    first_name: first_name,
-    last_name: last_name,
-    username: username,
-    email: email,
-    password: passwordData.passwordHash,
-    salt: passwordData.salt,
-    gender: gender,
-    phone_number: phone_number,
-    stream_link: stream_link,
-    twitch: twitch,
-    twitter: twitter,
-    facebook: facebook,
-    instagram: instagram,
-    youtube: youtube,
-    updated: moment().unix(),
-  },{
-    where:{id}
-  });
-  return true;
-  /*
-  let curUser = await User.findOne({where:{id}});
-  curUser.first_name = first_name;
-  curUser.last_name = last_name;
-  curUser.username = username;
-  curUser.email = email;
-  curUser.password = passwordData.passwordHash;
-  curUser.salt = passwordData.salt;
-  curUser.gender = gender;
-  curUser.phone_number = phone_number;
-  curUser.stream_link = stream_link;
-  curUser.twitch = twitch;
-  curUser.twitter = twitter;
-  curUser.facebook = facebook;
-  curUser.instagram = instagram;
-  curUser.youtube = youtube;
-  curUser.status = 'Active';
-  curUser.reset_token = 1;
-  curUser.updated = moment().unix();
-
-  let updatedUser = await curUser.save();
-  */
-};
-
-User.delete = async function(id) {
-  let del = await User.destroy({where:{id}});
-  
-  if (del) return true;
   return false;
 };
 

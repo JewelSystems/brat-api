@@ -1,9 +1,7 @@
 const API = require('../api/user');
-const schema = require('../schemas/UserSchema')
 
 module.exports = (app) => {
   app.post('/user', async (req, res) => {
-    //console.log(req.body);
     let response = await API.signup(
       req.body.first_name, 
       req.body.last_name, 
@@ -19,19 +17,19 @@ module.exports = (app) => {
       req.body.facebook,
       req.body.instagram,
       req.body.youtube
-      );
+    );
     
     res.status(response.status).send(response.body);
   });
 
   app.get('/user/:id', async (req, res) => {  
-    let response = await API.get(req.params);
+    let response = await API.get(req.params.id);
     res.status(response.status).send(response.body);
   });
 
   app.put('/user/:id', async (req, res) => {  
     let response = await API.update(
-      req.params,
+      req.params.id,
       req.body.first_name, 
       req.body.last_name, 
       req.body.username, 
@@ -46,12 +44,12 @@ module.exports = (app) => {
       req.body.facebook,
       req.body.instagram,
       req.body.youtube
-      );
+    );
     res.status(response.status).send(response.body);
   });
 
   app.delete('/user/:id', async (req, res) => {  
-    let response = await API.delete(req.params);
+    let response = await API.delete(req.params.id);
     res.status(response.status).send(response.body);
   });
 };

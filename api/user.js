@@ -29,6 +29,16 @@ exports.signup = async function(first_name, last_name, username, email, password
       }
     };
   }
+  // Verify if user already exists
+  if (await Controller.checkUsername(username)) {
+    return {
+      status: 403,
+      body: {
+        error: "Username already exists"
+      }
+    };
+  }
+
   //Request errors
   let response = await Controller.signup(first_name, last_name, username, email, password, gender, birthday, phone_number, stream_link, twitch, twitter, facebook, instagram, youtube);
   if (response.error) {
@@ -48,17 +58,26 @@ exports.signup = async function(first_name, last_name, username, email, password
   };
 };
 
-exports.get = async function(params) {
-  //Missing params
-  if (!params) {
+exports.get = async function(id) {
+  //Missing id
+  if (!id) {
     return {
       status: 403,
       body: {
-        error: "Missing params"
+        error: "Missing id"
       }
     };
   }
-  let response = await Controller.get(params.id);
+  // Verify if id exists
+  if (! await Controller.checkId(id)) {
+    return {
+      status: 403,
+      body: {
+        error: "User not found"
+      }
+    };
+  }
+  let response = await Controller.get(id);
   if (response.error) {
     return {
       status: 403,
@@ -71,30 +90,68 @@ exports.get = async function(params) {
   return{
     status: 200,
     body: {
-      res: response.success
+      res: response.success,
     }
-  }
+  };
 };
 
-exports.update = async function(params, first_name, last_name, username, email, password, gender, birthday, phone_number, stream_link, twitch, twitter, facebook, instagram, youtube) {
-  //Missing params TODO
-  if (!params) {
+exports.update = async function(id, first_name, last_name, username, email, password, gender, birthday, phone_number, stream_link, twitch, twitter, facebook, instagram, youtube) {
+  //Missing id
+  if (!id) {
     return {
       status: 403,
       body: {
-        error: "Missing params"
+        error: "Missing id"
       }
     };
   }
-  if(await Controller.checkUsername(params.id, username)){
+  // Schema Validation
+  try{
+    await userSchema.signup.validateAsync({
+      first_name: first_name,
+      last_name: last_name,
+      username: username,
+      email: email,
+      password: password,
+      gender: gender,
+      birthday: birthday,
+      phone_number: phone_number,
+      stream_link: stream_link,
+      twitch: twitch,
+      twitter: twitter,
+      facebook: facebook,
+      instagram: instagram,
+      youtube: youtube,
+    });
+  }catch(error){
+    // Joi Schema validation error
     return {
       status: 403,
       body: {
-        error: "Username already exists"
+        error: error
       }
     };
   }
-  let response = await Controller.update(params.id, first_name, last_name, username, email, password, gender, birthday, phone_number, stream_link, twitch, twitter, facebook, instagram, youtube);
+  // Verify if user exists
+  if (! await Controller.checkUsername(username)) {
+    return {
+      status: 403,
+      body: {
+        error: "Username not found"
+      }
+    };
+  }
+  // Verify if id exists
+  if (! await Controller.checkId(id)) {
+    return {
+      status: 403,
+      body: {
+        error: "User not found"
+      }
+    };
+  }
+
+  let response = await Controller.update(id, first_name, last_name, username, email, password, gender, birthday, phone_number, stream_link, twitch, twitter, facebook, instagram, youtube);
   if (response.error) {
     return {
       status: 403,
@@ -103,28 +160,37 @@ exports.update = async function(params, first_name, last_name, username, email, 
       }
     };
   }
+
+
   //Successful request
   return{
     status: 200,
     body: {
-      res: response.success
+      res: response.success,
     }
-  }
+  };
 };
 
-
-
-exports.delete = async function(params) {
-  //Missing params
-  if (!params) {
+exports.delete = async function(id) {
+  //Missing id
+  if (!id) {
     return {
       status: 403,
       body: {
-        error: "Missing params"
+        error: "Missing id"
       }
     };
   }
-  let response = await Controller.delete(params.id);
+  // Verify if id exists
+  if (! await Controller.checkId(id)) {
+    return {
+      status: 403,
+      body: {
+        error: "User not found"
+      }
+    };
+  }
+  let response = await Controller.delete(id);
   if (response.error) {
     return {
       status: 403,
@@ -137,7 +203,7 @@ exports.delete = async function(params) {
   return{
     status: 200,
     body: {
-      res: response.success
+      res: response.success,
     }
-  }
+  };
 };
