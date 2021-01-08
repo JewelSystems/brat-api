@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const { DataTypes } = require('sequelize');
 const sequelize = require('../loaders/sequelize');
+const moment = require('moment');
 
 let User = sequelize.define('User', {
   id: {
@@ -83,10 +84,6 @@ User.login = async function(username, password) {
   let hash = crypto.createHmac('sha512', salt); /** Hashing algorithm sha512 */
   hash.update(password);
   let value = hash.digest('hex');
-  console.log(1)
-  console.log(userFound.password)
-  console.log(2)
-  console.log(value)
   if (value == userFound.password) return true;
   return false;
 };
@@ -109,10 +106,10 @@ User.signup = async function(first_name, last_name, username, email, password, g
     facebook: facebook,
     instagram: instagram,
     youtube: youtube,
-    status: 'Active',
+    status: 'PendingEmail',
     reset_token: 1,
-    created: 1,
-    updated: 1,
+    created: moment().unix(),
+    updated: moment().unix(),
   });
 
   if (createUser) return createUser;
@@ -128,7 +125,27 @@ User.get = async function(id) {
 
 User.update = async function(id, first_name, last_name, username, email, password, gender, birthday, phone_number, stream_link, twitch, twitter, facebook, instagram, youtube) {
   let passwordData = await this.salt(password);
-
+  await User.update({
+    first_name: first_name,
+    last_name: last_name,
+    username: username,
+    email: email,
+    password: passwordData.passwordHash,
+    salt: passwordData.salt,
+    gender: gender,
+    phone_number: phone_number,
+    stream_link: stream_link,
+    twitch: twitch,
+    twitter: twitter,
+    facebook: facebook,
+    instagram: instagram,
+    youtube: youtube,
+    updated: moment().unix(),
+  },{
+    where:{id}
+  });
+  return true;
+  /*
   let curUser = await User.findOne({where:{id}});
   curUser.first_name = first_name;
   curUser.last_name = last_name;
@@ -146,13 +163,10 @@ User.update = async function(id, first_name, last_name, username, email, passwor
   curUser.youtube = youtube;
   curUser.status = 'Active';
   curUser.reset_token = 1;
-  curUser.created = 1;
-  curUser.updated = 1;
+  curUser.updated = moment().unix();
 
   let updatedUser = await curUser.save();
-
-  if (updatedUser) return updatedUser;
-  return false;
+  */
 };
 
 User.delete = async function(id) {

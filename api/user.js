@@ -1,12 +1,31 @@
 const Controller = require('../controller/user');
+const userSchema  = require('../schemas/UserSchema');
 
 exports.signup = async function(first_name, last_name, username, email, password, gender, birthday, phone_number, stream_link, twitch, twitter, facebook, instagram, youtube) {
-  //Missing params TODO
-  if (!username) {
+  // Schema Validation
+  try{
+    await userSchema.signup.validateAsync({
+      first_name: first_name,
+      last_name: last_name,
+      username: username,
+      email: email,
+      password: password,
+      gender: gender,
+      birthday: birthday,
+      phone_number: phone_number,
+      stream_link: stream_link,
+      twitch: twitch,
+      twitter: twitter,
+      facebook: facebook,
+      instagram: instagram,
+      youtube: youtube,
+    });
+  }catch(error){
+    // Joi Schema validation error
     return {
       status: 403,
       body: {
-        error: "Missing params"
+        error: error
       }
     };
   }
