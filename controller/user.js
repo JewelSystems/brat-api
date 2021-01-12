@@ -1,6 +1,5 @@
 const User = require('../models/User');
 const logger = require('../loaders/logger');
-const moment = require('moment');
 
 exports.signup = async function(first_name, last_name, username, email, password, gender, birthday, phone_number, stream_link, twitch, twitter, facebook, instagram, youtube) {
   logger.log("info", "Starting user signup function");
@@ -20,12 +19,10 @@ exports.signup = async function(first_name, last_name, username, email, password
       facebook: facebook,
       instagram: instagram,
       youtube: youtube,
-      /*
       salt: '',
-      status: 'PendingEmail',
-      created: 1,
-      updated: 1,
-      */
+      status: '',
+      created: '',
+      updated: '',
     });
     return {success: 'Creation success'};
   }catch(error){
@@ -50,14 +47,11 @@ exports.update = async function(id, first_name, last_name, username, email, pass
   logger.log("info", "Starting user update function");
   // Update user
   try{
-    console.log('aqui');
     await User.update({
       first_name: first_name,
       last_name: last_name,
       username: username,
       email: email,
-      password: passwordData.passwordHash,
-      salt: passwordData.salt,
       gender: gender,
       phone_number: phone_number,
       stream_link: stream_link,
@@ -66,13 +60,13 @@ exports.update = async function(id, first_name, last_name, username, email, pass
       facebook: facebook,
       instagram: instagram,
       youtube: youtube,
-      updated: moment().unix(),
     },{
       where:{id}
     });
     return {success: 'Update success'};
   }catch(error){
-    logger.log("error", "DB Error: " + JSON.stringify(error));
+    console.log(error);
+    //logger.log("error", "DB Error: " + JSON.stringify(error));
     return {error: "Server error"};
   }
 };

@@ -25,6 +25,7 @@ exports.login = async function(username, password) {
     tokenFound = await redis.get(`user-${token}`);
   } while (tokenFound);
   return {
+    id: userFound.id,
     token
   };
 };

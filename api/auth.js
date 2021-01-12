@@ -21,6 +21,7 @@ exports.login = async function(username, password) {
   return {
     status: 200,
     body: {
+      id: response.id,
       token: response.token
     }
   };

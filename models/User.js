@@ -65,15 +65,13 @@ let User = sequelize.define('User', {
   tableName: 'users',
   hooks:{
     beforeCreate: async user => {
-      let passwordData = await salt(user.password);
-      console.log(passwordData);
-
+      let passwordData = await User.salt(user.password);
       user.password = passwordData.passwordHash;
       user.salt = passwordData.salt;
       user.status = 'PendingEmail';
       user.created = moment().unix();
       user.updated = moment().unix();
-    }
+    },
   }
 });
 
