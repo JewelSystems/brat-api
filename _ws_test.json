@@ -1,0 +1,17 @@
+{"function":"login", "session_id":"1", "data":{"username": "ddd", "password": "12345678"}}
+{"function":"getUser", "session_id":"1", "data":{"id": "39"}}
+{"function":"signup", "session_id":"1", "data":{"first_name": "Vitor",
+    last_name: 'Hardoim',
+    username: 'vitorch',
+    email: 'vitor@gmail.com',
+    gender: 'M',
+    birthday: '1997-05-26',
+    phone_number: '21989604160',
+    password1: '12345678',
+    password2: '12345678',
+    stream_link: 'https://www.twitch.tv/yoda',
+    twitch: 'https://www.twitch.tv/yoda',
+    twitter: 'https://twitter.com/StoneDYooDa',
+    facebook: 'https://www.facebook.com/Stoneyoda/',
+    instagram: 'https://www.instagram.com/stonedyoda/?hl=pt-br',
+    youtube: 'https://www.youtube.com/channel/UCuhVlANZXUATGv1dRmwcUzA',}}

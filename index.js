@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const cors = require('cors');
 const routes = require('./routes');
 const logger = require('./loaders/logger');
+const http = require('http');
 
 const app = express();
 const port = 3000;
@@ -29,6 +30,18 @@ app.use(cors({
 // App routes
 routes(app);
 
+// Server
+let server = http.createServer(app);
+
+server.listen(port, () => {
+  logger.log("info", `BrAT listening at http://localhost:${port}`);
+});
+
+// Websocket
+require('./websockets')(server);
+
+/*
 app.listen(port, () => {
   logger.log("info", `BrAT listening at http://localhost:${port}`);
 });
+*/
