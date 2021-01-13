@@ -1,4 +1,5 @@
 const API = require('../api/user');
+const temp = require('../models/User_Permission');
 
 exports.get = async function(packet){
   return await API.get(packet.id);
@@ -9,5 +10,6 @@ exports.signup = async function(packet){
 };
 
 exports.getUsers = async function(){
+  console.log(await temp.get(1));
   return await API.getUsers();
-}
+};
