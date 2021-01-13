@@ -7,16 +7,20 @@ module.exports = (server) => {
   const wss = new ws.Server({ server });
   let functions = {
     login: auth.login,
-    getUser: user.get
+
+    getUser: user.get,
+    signup: user.signup
   };
+
   wss.on('connection', function connection(ws) {
     console.log('New client connection');
     resp = {
       session_id: uuidv4(),
     };
-    ws.send('Welcome, your session id is: '+ JSON.stringify(resp));
+    ws.send(JSON.stringify(resp));
 
     ws.on('message', async function incoming(message) {
+      console.log("recebido: ", message);
       let req = JSON.parse(message);
       let resp = await functions[req.function](req.data);
       ws.send(JSON.stringify(resp));

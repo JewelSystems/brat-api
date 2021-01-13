@@ -24,6 +24,7 @@ exports.login = async function(username, password) {
     token = crypto.randomBytes(64).toString('hex');
     tokenFound = await redis.get(`user-${token}`);
   } while (tokenFound);
+  saveToken = await redis.set(`user-${token}`, 'auth', 'EX', 3600);
   return {
     id: userFound.id,
     token
