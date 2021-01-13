@@ -207,3 +207,13 @@ exports.delete = async function(id) {
     }
   };
 };
+
+exports.getUsers = async function() {
+  let response = await Controller.getUsers();
+  if (response.error) {
+    return {"status": 403, "msg": response.error};
+  }
+  //Successful request
+  return {"status": 200, "msg": "listUsers", data:[response.success]};
+  //data:[{}]
+};

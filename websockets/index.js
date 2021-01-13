@@ -9,7 +9,8 @@ module.exports = (server) => {
     login: auth.login,
 
     getUser: user.get,
-    signup: user.signup
+    getUsers: user.getUsers,
+    signup: user.signup,
   };
 
   wss.on('connection', function connection(ws) {

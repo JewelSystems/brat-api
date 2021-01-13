@@ -83,6 +83,23 @@ exports.delete = async function(id) {
   }
 };
 
+exports.getUsers = async function() {
+  logger.log("info", "Starting get all users function");
+  // Get user
+  try{
+    let users = await User.findAll();
+    resp = [];
+    for (user in users){
+      let curUser = users[user].dataValues;
+      resp.push({"id": curUser.id, "first_name": curUser.first_name, "last_name": curUser.last_name, "username": curUser.username, "email": curUser.email});
+    }    
+    return {success: resp};
+  }catch(error){
+    logger.log("error", "DB Error: " + JSON.stringify(error));
+    return {error: "Server error"};
+  }
+};
+
 /*
  User Checks
 */
