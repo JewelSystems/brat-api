@@ -30,3 +30,17 @@ exports.login = async function(username, password) {
     token
   };
 };
+
+
+exports.redisAuthCheck = async function(token){
+  logger.log("info", "Starting redis authentication check function");
+  tokenFound = await redis.get(`user-${token}`);
+  if(!tokenFound){
+    return {
+      error: "Token not found"
+    };
+  }
+  return {
+    success: "Token found"
+  };
+};

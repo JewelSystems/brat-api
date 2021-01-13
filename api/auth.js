@@ -26,3 +26,15 @@ exports.login = async function(username, password) {
     }
   };
 };
+
+exports.checkToken = async function(token){
+  //Missing token]
+  if(!token){
+    return {"status": 403, "msg": "Missing token"};
+  }
+  let response = await Controller.redisAuthCheck(token);
+  if (response.error) {
+    return {"status": 403, "msg": response.error};
+  }
+  return {"status": 200, "msg": "authLogin"};
+};
