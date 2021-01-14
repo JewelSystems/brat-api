@@ -215,5 +215,4 @@ exports.getUsers = async function() {
   }
   //Successful request
   return {"status": 200, "msg": "listUsers", data:[response.success]};
-  //data:[{}]
 };

@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const logger = require('../loaders/logger');
 
-const UserPermission = require('../models/UserPermission');
+const db = require('../loaders/sequelize');
 
 exports.signup = async function(first_name, last_name, username, email, password, gender, birthday, phone_number, stream_link, twitch, twitter, facebook, instagram, youtube) {
   logger.log("info", "Starting user signup function");
@@ -89,14 +89,14 @@ exports.getUsers = async function() {
   logger.log("info", "Starting get all users function");
   // Get user
   try{
-    let users = await User.findAll();
+    const users = await db.query('SELECT users.id, users.first_name, users.last_name, users.username, users.email, GROUP_CONCAT(permissions.permission) as `permissions` FROM users, user_permissions, permissions WHERE users.id = user_permissions.user_id AND user_permissions.permission_id = permissions.id GROUP BY users.id');
     resp = [];
-    for (user in users){
-      let curUser = users[user].dataValues;
-      resp.push({"id": curUser.id, "first_name": curUser.first_name, "last_name": curUser.last_name, "username": curUser.username, "email": curUser.email, "permission": await UserPermission.get(curUser.id)});
-    }    
+    for (user in users[0]){
+      resp.push({"id": users[0][user].id, "first_name": users[0][user].first_name, "last_name": users[0][user].last_name, "username": users[0][user].username, "email": users[0][user].email, "permissions": users[0][user].permissions.split(',')});
+    }
     return {success: resp};
   }catch(error){
+    console.log(error);
     logger.log("error", "DB Error: " + JSON.stringify(error));
     return {error: "Server error"};
   }
