@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const logger = require('../loaders/logger');
 
+const UserPermission = require('../models/UserPermission');
+
 exports.signup = async function(first_name, last_name, username, email, password, gender, birthday, phone_number, stream_link, twitch, twitter, facebook, instagram, youtube) {
   logger.log("info", "Starting user signup function");
   // Signup user
@@ -91,7 +93,7 @@ exports.getUsers = async function() {
     resp = [];
     for (user in users){
       let curUser = users[user].dataValues;
-      resp.push({"id": curUser.id, "first_name": curUser.first_name, "last_name": curUser.last_name, "username": curUser.username, "email": curUser.email});
+      resp.push({"id": curUser.id, "first_name": curUser.first_name, "last_name": curUser.last_name, "username": curUser.username, "email": curUser.email, "permission": await UserPermission.get(curUser.id)});
     }    
     return {success: resp};
   }catch(error){

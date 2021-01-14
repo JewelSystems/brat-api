@@ -1,5 +1,5 @@
 const API = require('../api/user');
-const temp = require('../models/User_Permission');
+const temp = require('../models/UserPermission');
 
 exports.get = async function(packet){
   return await API.get(packet.id);
