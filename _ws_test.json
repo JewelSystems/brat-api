@@ -32,3 +32,9 @@
 {"function":"getEventExtra", "data":{"id": "2"}}
 {"function":"updateEventExtra", "data":{"id": 2, "event_id": "1", "type": "Anúncio", "time": 1200}}
 {"function":"deleteEventExtra", "data":{"id": 2}}
+
+//eventRun
+{"function":"createEventRun", "data":{"event_id": "1", "run_id": "1", "date": "20120618 10:34:09 AM", "run_time": null}}
+{"function":"getEventRun", "data":{"id": "2"}}
+{"function":"updateEventRun", "data":{"id": 1, "event_id": "1", "run_id": "1", "date": "20140618 10:34:09 AM", "run_time": null}}
+{"function":"deleteEventRun", "data":{"id": 2}}

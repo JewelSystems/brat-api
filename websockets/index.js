@@ -7,6 +7,7 @@ const run = require('./run');
 const runRunner = require('./runRunner');
 const event = require('./event');
 const eventExtra = require('./eventExtra');
+const eventRun = require('./eventRun');
 const { v4: uuidv4 } = require('uuid');
 
 module.exports = (server) => {
@@ -45,6 +46,11 @@ module.exports = (server) => {
     getEventExtra: eventExtra.get,
     updateEventExtra: eventExtra.update,
     deleteEventExtra: eventExtra.delete,
+
+    createEventRun: eventRun.create,
+    getEventRun: eventRun.get,
+    updateEventRun: eventRun.update,
+    deleteEventRun: eventRun.delete,
   };
 
   wss.on('connection', function connection(ws) {
