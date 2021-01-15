@@ -70,8 +70,7 @@ exports.update = async function(id, first_name, last_name, username, email, pass
     Log.log(id, id, "user_update");
     return {success: 'Update success'};
   }catch(error){
-    console.log(error);
-    //logger.log("error", "DB Error: " + JSON.stringify(error));
+    logger.log("error", "DB Error: " + JSON.stringify(error));
     return {error: "Server error"};
   }
 };
