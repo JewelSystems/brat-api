@@ -1,7 +1,7 @@
 const Controller = require('../controller/userPermission');
 
-exports.removePermission = async function(id, permission) {
-  let response = await Controller.removePermission(id, permission);
+exports.removePermission = async function(updatedUser, updaterUser, permission) {
+  let response = await Controller.removePermission(updatedUser, updaterUser, permission);
   if (response.error) {
     return {"status": 403, "msg": response.error};
   }
@@ -9,8 +9,8 @@ exports.removePermission = async function(id, permission) {
   return {"status": 200, "msg": "removePermission", data:[response.success]};
 };
 
-exports.addPermission = async function(id, permission) {
-  let response = await Controller.addPermission(id, permission);
+exports.addPermission = async function(updatedUser, updaterUser, permission) {
+  let response = await Controller.addPermission(updatedUser, updaterUser, permission);
   if (response.error) {
     return {"status": 403, "msg": response.error};
   }
