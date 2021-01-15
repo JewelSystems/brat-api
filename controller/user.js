@@ -2,12 +2,13 @@ const User = require('../models/User');
 const logger = require('../loaders/logger');
 
 const db = require('../loaders/sequelize');
+const Log = require('../models/UserLog');
 
 exports.signup = async function(first_name, last_name, username, email, password, gender, birthday, phone_number, stream_link, twitch, twitter, facebook, instagram, youtube) {
   logger.log("info", "Starting user signup function");
   // Signup user
   try{
-    await User.create({
+    const user = await User.create({
       first_name: first_name,
       last_name: last_name,
       username: username,
@@ -26,6 +27,7 @@ exports.signup = async function(first_name, last_name, username, email, password
       created: '',
       updated: '',
     });
+    Log.log(user.id, user.id, "user_create");
     return {success: 'Creation success'};
   }catch(error){
     logger.log("error", "DB Error: " + JSON.stringify(error));
@@ -65,6 +67,7 @@ exports.update = async function(id, first_name, last_name, username, email, pass
     },{
       where:{id}
     });
+    Log.log(id, id, "user_update");
     return {success: 'Update success'};
   }catch(error){
     console.log(error);
@@ -78,6 +81,7 @@ exports.delete = async function(id) {
   // Delete user
   try{
     let user = await User.destroy({where:{id}});
+    Log.log(id, id, "user_delete");
     return {success: user};
   }catch(error){
     logger.log("error", "DB Error: " + JSON.stringify(error));
