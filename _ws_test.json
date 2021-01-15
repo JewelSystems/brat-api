@@ -26,3 +26,9 @@
 {"function":"getEvent", "data":{"id": "2"}}
 {"function":"updateEvent", "data":{"id": 2, "name": "Novo Evento", "donation_link": "www.donation.com.br"}}
 {"function":"deleteEvent", "data":{"id": 2}}
+
+//eventExtra
+{"function":"createEventExtra", "data":{"event_id": "1", "type": "Entrevista", "time": 1200}}
+{"function":"getEventExtra", "data":{"id": "2"}}
+{"function":"updateEventExtra", "data":{"id": 2, "event_id": "1", "type": "Anúncio", "time": 1200}}
+{"function":"deleteEventExtra", "data":{"id": 2}}
