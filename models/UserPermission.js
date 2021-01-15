@@ -1,8 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../loaders/sequelize');
 
-const Permission = require('./Permission');
-
 let UserPermission = sequelize.define('UserPermission', {
   id: {
     type: DataTypes.BIGINT(20),

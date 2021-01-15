@@ -1,6 +1,7 @@
 const ws = require('ws');
 const user = require('./user');
 const auth = require('./auth');
+const userPermission = require('./userPermission');
 const { v4: uuidv4 } = require('uuid');
 
 module.exports = (server) => {
@@ -11,6 +12,9 @@ module.exports = (server) => {
     getUser: user.get,
     getUsers: user.getUsers,
     signup: user.signup,
+
+    removePermission: userPermission.removePermission,
+    addPermission: userPermission.addPermission,
   };
 
   wss.on('connection', function connection(ws) {
