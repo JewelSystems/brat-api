@@ -49,8 +49,8 @@ exports.delete = async function(id) {
   logger.log("info", "Starting game delete function");
   // Delete game
   try{
-    let user = await Game.destroy({where:{id}});
-    return {success: user};
+    let game = await Game.destroy({where:{id}});
+    return {success: game};
   }catch(error){
     logger.log("error", "DB Error: " + JSON.stringify(error));
     return {error: "Server error"};

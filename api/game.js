@@ -6,7 +6,7 @@ exports.create = async function(name, year) {
     return {"status": 403, "msg": response.error};
   }
   //Successful request
-  return {"status": 200, "msg": "listUsers", data:[response.success]};
+  return {"status": 200, "msg": "createGame", data:[response.success]};
 };
 
 exports.get = async function(id) {
@@ -15,7 +15,7 @@ exports.get = async function(id) {
     return {"status": 403, "msg": response.error};
   }
   //Successful request
-  return {"status": 200, "msg": "listUsers", data:[response.success]};
+  return {"status": 200, "msg": "getGame", data:[response.success]};
 };
 
 exports.update = async function(id, name, year) {
@@ -24,7 +24,7 @@ exports.update = async function(id, name, year) {
     return {"status": 403, "msg": response.error};
   }
   //Successful request
-  return {"status": 200, "msg": "listUsers", data:[response.success]};
+  return {"status": 200, "msg": "updateGame", data:[response.success]};
 };
 
 exports.delete = async function(id) {
@@ -33,5 +33,5 @@ exports.delete = async function(id) {
     return {"status": 403, "msg": response.error};
   }
   //Successful request
-  return {"status": 200, "msg": "listUsers", data:[response.success]};
+  return {"status": 200, "msg": "deleteGame", data:[response.success]};
 };

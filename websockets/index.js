@@ -3,6 +3,7 @@ const user = require('./user');
 const auth = require('./auth');
 const userPermission = require('./userPermission');
 const game = require('./game');
+const run = require('./run');
 const { v4: uuidv4 } = require('uuid');
 
 module.exports = (server) => {
@@ -21,6 +22,11 @@ module.exports = (server) => {
     getGame: game.get,
     updateGame: game.update,
     deleteGame: game.delete,
+
+    createRun: run.create,
+    getRun: run.get,
+    updateRun: run.update,
+    deleteRun: run.delete,
   };
 
   wss.on('connection', function connection(ws) {

@@ -8,3 +8,9 @@
 {"function":"getGame", "data":{"id": "1"}}
 {"function":"updateGame", "data":{"id": 2, "name": "Crash Bandicoot N. Trilogy", "year": "1996"}}
 {"function":"deleteGame", "data":{"id": 2}}
+
+//run
+{"function":"createRun", "data":{"game_id": "1", "category": "100%", "estimated_time": "3600", "preferred_time_slot": "afternoon"}}
+{"function":"getRun", "data":{"id": "2"}}
+{"function":"updateRun", "data":{"id": 2, "game_id": "1", "category": "any%", "estimated_time": "3600", "preferred_time_slot": "afternoon"}}
+{"function":"deleteRun", "data":{"id": 2}}
