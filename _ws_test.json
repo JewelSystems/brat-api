@@ -14,3 +14,9 @@
 {"function":"getRun", "data":{"id": "2"}}
 {"function":"updateRun", "data":{"id": 2, "game_id": "1", "category": "any%", "estimated_time": "3600", "preferred_time_slot": "afternoon"}}
 {"function":"deleteRun", "data":{"id": 2}}
+
+//runRunner
+{"function":"createRunRunner", "data":{"runner_id": "1", "run_id": "1"}}
+{"function":"getRunRunner", "data":{"id": "2"}}
+{"function":"updateRunRunner", "data":{"id": 2, "runner_id": "40", "run_id": "1"}}
+{"function":"deleteRunRunner", "data":{"id": 2}}
