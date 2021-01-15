@@ -5,6 +5,7 @@ const userPermission = require('./userPermission');
 const game = require('./game');
 const run = require('./run');
 const runRunner = require('./runRunner');
+const event = require('./event');
 const { v4: uuidv4 } = require('uuid');
 
 module.exports = (server) => {
@@ -33,6 +34,11 @@ module.exports = (server) => {
     getRunRunner: runRunner.get,
     updateRunRunner: runRunner.update,
     deleteRunRunner: runRunner.delete,
+
+    createEvent: event.create,
+    getEvent: event.get,
+    updateEvent: event.update,
+    deleteEvent: event.delete,
   };
 
   wss.on('connection', function connection(ws) {

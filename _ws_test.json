@@ -20,3 +20,9 @@
 {"function":"getRunRunner", "data":{"id": "2"}}
 {"function":"updateRunRunner", "data":{"id": 2, "runner_id": "40", "run_id": "1"}}
 {"function":"deleteRunRunner", "data":{"id": 2}}
+
+//event
+{"function":"createEvent", "data":{"name": "Evento 2", "donation_link": "www.donation.com.br"}}
+{"function":"getEvent", "data":{"id": "2"}}
+{"function":"updateEvent", "data":{"id": 2, "name": "Novo Evento", "donation_link": "www.donation.com.br"}}
+{"function":"deleteEvent", "data":{"id": 2}}
