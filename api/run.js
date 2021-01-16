@@ -1,7 +1,7 @@
 const Controller = require('../controller/run');
 
-exports.create = async function(gameId, category, estimatedTime, preferredTime) {
-  let response = await Controller.create(gameId, category, estimatedTime, preferredTime);
+exports.create = async function(gameId, category, estimatedTime, preferredTime, platform) {
+  let response = await Controller.create(gameId, category, estimatedTime, preferredTime, platform);
   if (response.error) {
     return {"status": 403, "msg": response.error};
   }
@@ -18,8 +18,8 @@ exports.get = async function(id) {
   return {"status": 200, "msg": "getRun", data:[response.success]};
 };
 
-exports.update = async function(id, gameId, category, estimatedTime, preferredTime) {
-  let response = await Controller.update(id, gameId, category, estimatedTime, preferredTime);
+exports.update = async function(id, gameId, category, estimatedTime, preferredTime, platform) {
+  let response = await Controller.update(id, gameId, category, estimatedTime, preferredTime, platform);
   if (response.error) {
     return {"status": 403, "msg": response.error};
   }

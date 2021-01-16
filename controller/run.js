@@ -1,7 +1,7 @@
 const Run = require('../models/Run');
 const logger = require('../loaders/logger');
 
-exports.create = async function(gameId, category, estimatedTime, preferredTime) {
+exports.create = async function(gameId, category, estimatedTime, preferredTime, platform) {
   logger.log("info", "Starting run create function");
   // Create run
   try{
@@ -9,7 +9,8 @@ exports.create = async function(gameId, category, estimatedTime, preferredTime) 
       game_id: gameId,
       category: category,
       estimated_time: estimatedTime,
-      preferred_time_slot: preferredTime
+      preferred_time_slot: preferredTime,
+      platform: platform
     });
     return {success: 'Creation success'};
   }catch(error){
@@ -30,7 +31,7 @@ exports.get = async function(id) {
   }
 };
 
-exports.update = async function(id, gameId, category, estimatedTime, preferredTime) {
+exports.update = async function(id, gameId, category, estimatedTime, preferredTime, platform) {
   logger.log("info", "Starting run update function");
   // Update run
   try{
@@ -38,7 +39,8 @@ exports.update = async function(id, gameId, category, estimatedTime, preferredTi
       game_id: gameId,
       category: category,
       estimated_time: estimatedTime,
-      preferred_time_slot: preferredTime
+      preferred_time_slot: preferredTime,
+      platform: platform
     },{
       where:{id}
     });

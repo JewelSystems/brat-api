@@ -25,6 +25,10 @@ let Run = sequelize.define('Run', {
   preferred_time_slot:{
     type: DataTypes.STRING(10),
     allowNull: false
+  },
+  platform:{
+    type: DataTypes.STRING(20),
+    allowNull: false
   }
 }, {
   sequelize,

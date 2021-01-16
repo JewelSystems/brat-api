@@ -10,10 +10,10 @@
 {"function":"deleteGame", "data":{"id": 2}}
 
 //run
-{"function":"createRun", "data":{"game_id": "1", "category": "100%", "estimated_time": "3600", "preferred_time_slot": "afternoon"}}
-{"function":"getRun", "data":{"id": "2"}}
-{"function":"updateRun", "data":{"id": 2, "game_id": "1", "category": "any%", "estimated_time": "3600", "preferred_time_slot": "afternoon"}}
-{"function":"deleteRun", "data":{"id": 2}}
+{"function":"createRun", "data":{"game_id": "27", "category": "100%", "estimated_time": "3600", "preferred_time_slot": "afternoon", "platform": "PS4"}}
+{"function":"getRun", "data":{"id": "6"}}
+{"function":"updateRun", "data":{"id": 6, "game_id": "27", "category": "any%", "estimated_time": "3600", "preferred_time_slot": "morning",  "platform": "PC"}}
+{"function":"deleteRun", "data":{"id": 6}}
 
 //runRunner
 {"function":"createRunRunner", "data":{"runner_id": "1", "run_id": "1"}}
@@ -34,7 +34,7 @@
 {"function":"deleteEventExtra", "data":{"id": 2}}
 
 //eventRun
-{"function":"createEventRun", "data":{"event_id": "1", "run_id": "1", "date": "20120618 10:34:09 AM", "run_time": null}}
+{"function":"createEventRun", "data":{"event_id": "1", "run_id": "1", "date": "2021-01-17", "run_time": null}}
 {"function":"getEventRun", "data":{"id": "2"}}
-{"function":"updateEventRun", "data":{"id": 1, "event_id": "1", "run_id": "1", "date": "20140618 10:34:09 AM", "run_time": null}}
+{"function":"updateEventRun", "data":{"id": 1, "event_id": "1", "run_id": "1", "date": "2021-01-18", "run_time": null}}
 {"function":"deleteEventRun", "data":{"id": 2}}
