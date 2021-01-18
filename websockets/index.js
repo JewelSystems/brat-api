@@ -9,9 +9,6 @@ const event = require('./event');
 const eventExtra = require('./eventExtra');
 const eventRun = require('./eventRun');
 
-//temp
-const authCtrl = require('../controller/auth');
-
 module.exports = (server) => {
   let counter = 0;
   const wss = new ws.Server({ server });
@@ -30,50 +27,61 @@ module.exports = (server) => {
 
     ws.on('message', async function incoming(message) {
       console.log("Received: ", message);
-      const msg = JSON.parse(message);
+      let msg;
+      let packet;
+      try{
+        msg = JSON.parse(message);
+      }catch(error){
+        packet = {"endpoint": "", "id":"", "info":{"status": "403", "msg": "Parsing error"}};
+        return ws.send(JSON.stringify(packet));
+      }
+
       //Check if incoming info exists
-      if(!msg){
-        ws.send(JSON.stringify({"status": "403", "msg": "Missing Params"}));
-      }else if(!msg.endpoint){
-        ws.send(JSON.stringify({"status": "403", "msg": "Undefined Requisition"}));
+      if(!msg.endpoint){
+        packet = {"endpoint": "", "id":"", "info":{"status": "403", "msg": "Undefined requisition"}};
+        return ws.send(JSON.stringify(packet));
       }else if(!msg.id){
-        ws.send(JSON.stringify({"status": "403", "msg": "Missing Id"}));
-      }else{        
-        let req = JSON.parse(message);
-        const { endpoint, id, info } = req;
-        ws.reqId = id;
-        // Unlogged
-        if(!ws.authenticated){
-          if(!info.token && endpoint !== login){
-            ws.send(JSON.stringify({"status": "403", "msg": "Invalid action, needs login"}));
-          }else{
-            ws.authToken = info.token;
-            let resp = await ws.functions[endpoint](info);
-            if(resp.status === 200){
-              ws.authenticated = true;
-              const userData = await authCtrl.getAuthData(ws.authToken);
-              ws.user = userData.user;
-              ws.permissions = userData.permissions[0][0].permissions.split(',');
-            }
-            ws.send(JSON.stringify(resp));
-          }
+        packet = {"endpoint": "", "id":"", "info":{"status": "403", "msg": "Missing id"}};
+        return ws.send(JSON.stringify(packet));
+      }
+
+      const { endpoint, id, info } = msg;
+      // Unlogged
+      if(!ws.authenticated){
+        if(!info.token && endpoint !== "login"){
+          packet = {"endpoint": endpoint, "id": id, "info":{"status": "403", "msg": "Invalid action, needs login"}};
         }else{
-          if(ws.permissions.includes('Admin')){
-            console.log("ADMIN");
-            ws.functions = loggedFunctionsAdmin;
+          packet = await ws.functions[endpoint](info);
+          if(packet.status === 200){
+            ws.authToken = info.token;
+            ws.authenticated = true;
+
+            ws.user = packet.user;
+            ws.permissions = packet.permissions;
+
+            packet = {"endpoint": endpoint, "id":id, "info":{"status": packet.status, "msg": "authLogin"}};
+
+            if(ws.permissions.includes('Admin')){
+              console.log("ADMIN");
+              ws.functions = loggedFunctionsAdmin;
+            }else{
+              console.log('NOT ADMIN');
+              ws.functions = loggedFunctionsBase;
+            }
           }else{
-            console.log('NOT ADMIN');
-            ws.functions = loggedFunctionsBase;
-          }
-          // Check if incoming requisition is possible
-          if(ws.functions[endpoint] === undefined){
-            ws.send(JSON.stringify({"status": "403", "msg": "Undefined Endpoint"}));
-          }else{
-            let resp = await ws.functions[endpoint](info);
-            ws.send(JSON.stringify(resp));
+            packet = {"endpoint": endpoint, "id":id, "info":{"status": "403", "msg": "User could not be authenticated"}};
           }
         }
+      }else{
+        // Check if incoming requisition is possible
+        if(ws.functions[endpoint] === undefined){
+          packet = {"endpoint": endpoint, "id": id, "info":{"status": "403", "msg": "Undefined endpoint"}};
+        }else{
+          packet = await ws.functions[endpoint](info);
+          packet = {"endpoint": endpoint, "id": id, "info":{"status": packet.status, "msg": packet.msg}, "data":packet.data};
+        }
       }
+      ws.send(JSON.stringify(packet));
     });
     
     ws.on('close', async function close(){

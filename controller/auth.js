@@ -35,23 +35,16 @@ exports.login = async function(username, password) {
 
 exports.redisAuthCheck = async function(token){
   logger.log("info", "Starting redis authentication check function");
-  const tokenFound = await redis.get(`user-${token}`);
-  if(!tokenFound){
+  const user = await redis.get(`user-${token}`);
+  const permissions = await db.query("SELECT GROUP_CONCAT(permissions.permission) as `permissions` FROM user_permissions, permissions WHERE '" + user + "' = user_permissions.user_id AND user_permissions.permission_id = permissions.id");
+  if(!user){
     return {
       error: "Token not found"
     };
   }
   return {
-    success: "Token found"
-  };
-};
-
-exports.getAuthData = async function(token){
-  logger.log("info", "Starting get authentication data function");
-  const user = await redis.get(`user-${token}`);
-  const permissions = await db.query("SELECT GROUP_CONCAT(permissions.permission) as `permissions` FROM user_permissions, permissions WHERE '" + user + "' = user_permissions.user_id AND user_permissions.permission_id = permissions.id");
-  return{
+    success: "Token found",
     user: user,
-    permissions: permissions
+    permissions: permissions[0][0].permissions.split(',')
   };
 };

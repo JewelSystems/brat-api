@@ -36,5 +36,5 @@ exports.checkToken = async function(token){
   if (response.error) {
     return {"status": 403, "msg": response.error};
   }
-  return {"status": 200, "msg": "authLogin"};
+  return {"status": 200, "msg": "authLogin", user: response.user, permissions: response.permissions};
 };
