@@ -1,13 +1,14 @@
 const Controller = require('../controller/user');
 const userSchema  = require('../schemas/UserSchema');
 
-exports.signup = async function(first_name, last_name, username, email, password, gender, birthday, phone_number, stream_link, twitch, twitter, facebook, instagram, youtube) {
+exports.signup = async function(first_name, last_name, username, nickname, email, password, gender, birthday, phone_number, stream_link, twitch, twitter, facebook, instagram, youtube) {
   // Schema Validation
   try{
     await userSchema.signup.validateAsync({
       first_name: first_name,
       last_name: last_name,
       username: username,
+      nickname: nickname,
       email: email,
       password: password,
       gender: gender,
@@ -38,9 +39,8 @@ exports.signup = async function(first_name, last_name, username, email, password
       }
     };
   }
-
   //Request errors
-  let response = await Controller.signup(first_name, last_name, username, email, password, gender, birthday, phone_number, stream_link, twitch, twitter, facebook, instagram, youtube);
+  let response = await Controller.signup(first_name, last_name, username, nickname, email, password, gender, birthday, phone_number, stream_link, twitch, twitter, facebook, instagram, youtube);
   if (response.error) {
     return {
       status: 403,
@@ -95,7 +95,7 @@ exports.get = async function(id) {
   };
 };
 
-exports.update = async function(id, first_name, last_name, username, email, password, gender, birthday, phone_number, stream_link, twitch, twitter, facebook, instagram, youtube) {
+exports.update = async function(id, first_name, last_name, username, nickname, email, password, gender, birthday, phone_number, stream_link, twitch, twitter, facebook, instagram, youtube) {
   //Missing id
   if (!id) {
     return {
@@ -111,6 +111,7 @@ exports.update = async function(id, first_name, last_name, username, email, pass
       first_name: first_name,
       last_name: last_name,
       username: username,
+      nickname: nickname,
       email: email,
       password: password,
       gender: gender,
@@ -151,7 +152,7 @@ exports.update = async function(id, first_name, last_name, username, email, pass
     };
   }
 
-  let response = await Controller.update(id, first_name, last_name, username, email, password, gender, birthday, phone_number, stream_link, twitch, twitter, facebook, instagram, youtube);
+  let response = await Controller.update(id, first_name, last_name, username, nickname, email, password, gender, birthday, phone_number, stream_link, twitch, twitter, facebook, instagram, youtube);
   if (response.error) {
     return {
       status: 403,

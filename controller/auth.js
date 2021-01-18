@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const User = require('../models/User');
 const redis = require('../loaders/redis');
 const logger = require('../loaders/logger');
+const db = require('../loaders/sequelize');
 
 exports.login = async function(username, password) {
   logger.log("info", "Starting login function");
@@ -24,7 +25,7 @@ exports.login = async function(username, password) {
     token = crypto.randomBytes(64).toString('hex');
     tokenFound = await redis.get(`user-${token}`);
   } while (tokenFound);
-  saveToken = await redis.set(`user-${token}`, 'auth', 'EX', 3600);
+  saveToken = await redis.set(`user-${token}`, userFound.id, 'EX', 3600);
   return {
     id: userFound.id,
     token
@@ -34,7 +35,7 @@ exports.login = async function(username, password) {
 
 exports.redisAuthCheck = async function(token){
   logger.log("info", "Starting redis authentication check function");
-  tokenFound = await redis.get(`user-${token}`);
+  const tokenFound = await redis.get(`user-${token}`);
   if(!tokenFound){
     return {
       error: "Token not found"
@@ -42,5 +43,15 @@ exports.redisAuthCheck = async function(token){
   }
   return {
     success: "Token found"
+  };
+};
+
+exports.getAuthData = async function(token){
+  logger.log("info", "Starting get authentication data function");
+  const user = await redis.get(`user-${token}`);
+  const permissions = await db.query("SELECT GROUP_CONCAT(permissions.permission) as `permissions` FROM user_permissions, permissions WHERE '" + user + "' = user_permissions.user_id AND user_permissions.permission_id = permissions.id");
+  return{
+    user: user,
+    permissions: permissions
   };
 };

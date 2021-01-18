@@ -4,7 +4,7 @@ const logger = require('../loaders/logger');
 const db = require('../loaders/sequelize');
 const Log = require('../models/UserLog');
 
-exports.signup = async function(first_name, last_name, username, email, password, gender, birthday, phone_number, stream_link, twitch, twitter, facebook, instagram, youtube) {
+exports.signup = async function(first_name, last_name, username, nickname, email, password, gender, birthday, phone_number, stream_link, twitch, twitter, facebook, instagram, youtube) {
   logger.log("info", "Starting user signup function");
   // Signup user
   try{
@@ -12,9 +12,11 @@ exports.signup = async function(first_name, last_name, username, email, password
       first_name: first_name,
       last_name: last_name,
       username: username,
+      nickname: nickname,
       email: email,
       password: password,
       gender: gender,
+      birthday: birthday,
       phone_number: phone_number,
       stream_link: stream_link,
       twitch: twitch,
@@ -47,7 +49,7 @@ exports.get = async function(id) {
   }
 };
 
-exports.update = async function(id, first_name, last_name, username, email, password, gender, birthday, phone_number, stream_link, twitch, twitter, facebook, instagram, youtube) {
+exports.update = async function(id, first_name, last_name, username, nickname, email, password, gender, birthday, phone_number, stream_link, twitch, twitter, facebook, instagram, youtube) {
   logger.log("info", "Starting user update function");
   // Update user
   try{

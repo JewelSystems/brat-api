@@ -6,6 +6,7 @@ module.exports = (app) => {
       req.body.first_name, 
       req.body.last_name, 
       req.body.username, 
+      req.body.nickname,
       req.body.email, 
       req.body.password, 
       req.body.gender, 

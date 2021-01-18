@@ -22,6 +22,10 @@ let User = sequelize.define('User', {
     type: DataTypes.STRING(80),
     allowNull: false
   },
+  nickname: {
+    type: DataTypes.STRING(80),
+    allowNull: false
+  },
   email: {
     type: DataTypes.STRING(80),
     allowNull: false
@@ -36,6 +40,10 @@ let User = sequelize.define('User', {
   },
   gender: {
     type: DataTypes.STRING(10),
+    allowNull: false
+  },
+  birthday: {
+    type: DataTypes.DATE,
     allowNull: false
   },
   status: {

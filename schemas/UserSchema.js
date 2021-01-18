@@ -4,6 +4,7 @@ exports.signup = Joi.object({
   first_name: Joi.string().min(1).max(50).required(),
   last_name: Joi.string().min(1).max(50).required(),
   username: Joi.string().min(1).max(80).required(),
+  nickname: Joi.string().min(1).max(80).required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(8).max(64).required(),
   gender: Joi.string().min(1).max(1).required(),

@@ -22,7 +22,7 @@ let UserLog = sequelize.define('UserLog', {
     allowNull: false,
   },
   type: {
-    type: DataTypes.STRING(30),
+    type: DataTypes.STRING(50),
     allowNull: false,
   },  
   epoch: {
