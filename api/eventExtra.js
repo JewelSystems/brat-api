@@ -35,3 +35,12 @@ exports.delete = async function(id) {
   //Successful request
   return {"status": 200, "msg": "deleteEventExtra", data:[response.success]};
 };
+
+exports.getExtras = async function() {
+  let response = await Controller.getExtras();
+  if (response.error) {
+    return {"status": 403, "msg": response.error};
+  }
+  //Successful request
+  return {"status": 200, "msg": "listExtras", data:[response.success]};
+};

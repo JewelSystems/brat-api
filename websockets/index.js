@@ -121,11 +121,13 @@ let loggedFunctionsAdmin = {
   getEvent: event.get,
   updateEvent: event.update,
   deleteEvent: event.delete,
+  getEvents: event.getEvents,
 
   createEventExtra: eventExtra.create,
   getEventExtra: eventExtra.get,
   updateEventExtra: eventExtra.update,
   deleteEventExtra: eventExtra.delete,
+  getEventExtras: eventExtra.getExtras,
 
   createEventRun: eventRun.create,
   getEventRun: eventRun.get,
@@ -152,6 +154,7 @@ let loggedFunctionsBase = {
 
   createEventExtra: eventExtra.create,
   getEventExtra: eventExtra.get,
+  getEventExtras: eventExtra.getExtras,
 
   createEventRun: eventRun.create,
   getEventRun: eventRun.get,

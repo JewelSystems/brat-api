@@ -61,3 +61,20 @@ exports.delete = async function(id) {
     return {error: "Server error"};
   }
 };
+
+exports.getEvents = async function() {
+  logger.log("info", "Starting get all events function");
+  // Get events
+  try{
+    const events = await Event.findAll();
+    resp = [];
+    for(let event in events){
+      resp.push(events[event].dataValues);
+    }
+    return {success: resp};
+  }catch(error){
+    console.log(error);
+    logger.log("error", "DB Error: " + JSON.stringify(error));
+    return {error: "Server error"};
+  }
+};

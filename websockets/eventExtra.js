@@ -15,3 +15,7 @@ exports.update = async function(packet){
 exports.delete = async function(packet){
   return await API.delete(packet.id);
 };
+
+exports.getExtras = async function(){
+  return await API.getExtras();
+};
