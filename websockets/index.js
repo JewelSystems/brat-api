@@ -81,6 +81,7 @@ module.exports = (server) => {
           packet = {"endpoint": endpoint, "id": id, "info":{"status": packet.status, "msg": packet.msg}, "data":packet.data};
         }
       }
+      //console.log("Sent: ", packet);
       ws.send(JSON.stringify(packet));
     });
     
@@ -103,11 +104,13 @@ let loggedFunctionsAdmin = {
   getGame: game.get,
   updateGame: game.update,
   deleteGame: game.delete,
+  getGames: game.getGames,
 
   createRun: run.create,
   getRun: run.get,
   updateRun: run.update,
   deleteRun: run.delete,
+  createRunNGame: run.createRunNGame,
 
   createRunRunner: runRunner.create,
   getRunRunner: runRunner.get,
@@ -137,6 +140,7 @@ let loggedFunctionsBase = {
 
   createGame: game.create,
   getGame: game.get,
+  getGames: game.getGames,
 
   createRun: run.create,
   getRun: run.get,

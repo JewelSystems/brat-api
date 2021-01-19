@@ -56,3 +56,20 @@ exports.delete = async function(id) {
     return {error: "Server error"};
   }
 };
+
+exports.getGames = async function() {
+  logger.log("info", "Starting get all users function");
+  // Get user
+  try{
+    const games = await Game.findAll();
+    resp = [];
+    for(let game in games){
+      resp.push(games[game].dataValues);
+    }
+    return {success: resp};
+  }catch(error){
+    console.log(error);
+    logger.log("error", "DB Error: " + JSON.stringify(error));
+    return {error: "Server error"};
+  }
+};

@@ -35,3 +35,12 @@ exports.delete = async function(id) {
   //Successful request
   return {"status": 200, "msg": "deleteGame", data:[response.success]};
 };
+
+exports.getGames = async function() {
+  let response = await Controller.getGames();
+  if (response.error) {
+    return {"status": 403, "msg": response.error};
+  }
+  //Successful request
+  return {"status": 200, "msg": "listGames", data:[response.success]};
+};
