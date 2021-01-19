@@ -23,7 +23,8 @@ exports.create = async function(runnerId, gameId, category, estimatedTime, prefe
       event_id: 1,
       run_id: run.id,
       reviewed: false,
-      approved: false
+      approved: false,
+      waiting: false
     });
     return {success: 'Creation success'};
   }catch(error){
@@ -99,7 +100,8 @@ exports.createRunNGame = async function(runnerId, category, estimatedTime, prefe
       event_id: 1,
       run_id: run.id,
       reviewed: false,
-      approved: false
+      approved: false,
+      waiting: false
     });
     return {success: 'Creation success'};
   }catch(error){

@@ -28,6 +28,10 @@ let SubmitRun = sequelize.define('SubmitRun', {
     type: DataTypes.BOOLEAN,
     allowNull: false
   },
+  waiting: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false
+  },
 }, {
   sequelize,
   timestamps: false,
