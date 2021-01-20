@@ -41,9 +41,11 @@ exports.get = async function(id) {
   logger.log("info", "Starting user get function");
   // Get user
   try{
-    let user = await User.findOne({where:{id}});
+    let user = await db.query('SELECT users.id, users.first_name, users.last_name, users.username, users.email, users.gender, users.phone_number, users.stream_link, users.twitch, users.twitter, users.facebook, users.instagram, users.youtube, GROUP_CONCAT(permissions.permission) as `permissions` FROM users, user_permissions, permissions WHERE users.id = ' +id+ ' AND users.id = user_permissions.user_id AND user_permissions.permission_id = permissions.id GROUP BY users.id');
+    console.log(user);
     return {success: user};
   }catch(error){
+    console.log(error);
     logger.log("error", "DB Error: " + JSON.stringify(error));
     return {error: "Server error"};
   }
@@ -66,6 +68,8 @@ exports.update = async function(id, first_name, last_name, username, nickname, e
       facebook: facebook,
       instagram: instagram,
       youtube: youtube,
+      nickname: nickname,
+      birthday: birthday,
     },{
       where:{id}
     });
