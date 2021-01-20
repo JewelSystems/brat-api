@@ -24,9 +24,6 @@ let EventRun = sequelize.define('EventRun', {
     type: DataTypes.DATE,
     allowNull: false
   },
-  run_time: {
-    type: DataTypes.BIGINT(20),
-  },
 }, {
   sequelize,
   timestamps: false,

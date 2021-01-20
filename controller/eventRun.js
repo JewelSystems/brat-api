@@ -1,7 +1,7 @@
 const EventRun = require('../models/EventRun');
 const logger = require('../loaders/logger');
 
-exports.create = async function(eventId, runId, date, runTime) {
+exports.create = async function(eventId, runId, date) {
   logger.log("info", "Starting event run create function");
   // Create event run
   try{
@@ -9,7 +9,6 @@ exports.create = async function(eventId, runId, date, runTime) {
       event_id: eventId,
       run_id: runId,
       date: date,
-      run_time: runTime
     });
     return {success: 'Creation success'};
   }catch(error){
@@ -30,7 +29,7 @@ exports.get = async function(id) {
   }
 };
 
-exports.update = async function(id, eventId, runId, date, runTime) {
+exports.update = async function(id, eventId, runId, date) {
   logger.log("info", "Starting event run update function");
   // Update event run
   try{
@@ -38,7 +37,6 @@ exports.update = async function(id, eventId, runId, date, runTime) {
       event_id: eventId,
       run_id: runId,
       date: date,
-      run_time: runTime
     },{
       where:{id}
     });

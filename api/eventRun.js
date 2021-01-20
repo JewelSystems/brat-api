@@ -1,7 +1,7 @@
 const Controller = require('../controller/eventRun');
 
-exports.create = async function(eventId, runId, date, runTime) {
-  let response = await Controller.create(eventId, runId, date, runTime);
+exports.create = async function(eventId, runId, date) {
+  let response = await Controller.create(eventId, runId, date);
   if (response.error) {
     return {"status": 403, "msg": response.error};
   }
@@ -18,8 +18,8 @@ exports.get = async function(id) {
   return {"status": 200, "msg": "getEventRun", data:[response.success]};
 };
 
-exports.update = async function(id, eventId, runId, date, runTime) {
-  let response = await Controller.update(id, eventId, runId, date, runTime);
+exports.update = async function(id, eventId, runId, date) {
+  let response = await Controller.update(id, eventId, runId, date);
   if (response.error) {
     return {"status": 403, "msg": response.error};
   }

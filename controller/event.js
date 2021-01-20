@@ -1,13 +1,14 @@
 const Event = require('../models/Event');
 const logger = require('../loaders/logger');
 
-exports.create = async function(name, donationLink) {
+exports.create = async function(name, donationLink, date) {
   logger.log("info", "Starting event create function");
   // Create event
   try{
     await Event.create({
       name: name,
       donation_link: donationLink,
+      date: date,
       active: true,
     });
     return {success: 'Creation success'};
@@ -29,13 +30,14 @@ exports.get = async function(id) {
   }
 };
 
-exports.update = async function(id, name, donationLink) {
+exports.update = async function(id, name, donationLink, date) {
   logger.log("info", "Starting event update function");
   // Update event
   try{
     await Event.update({
       name: name,
-      donation_link: donationLink
+      donation_link: donationLink,
+      date: date
     },{
       where:{id}
     });

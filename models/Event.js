@@ -20,6 +20,10 @@ let Event = sequelize.define('Event', {
     type: DataTypes.BOOLEAN,
     allowNull: false
   },
+  date: {
+    type: DataTypes.DATE,
+    allowNull: false
+  }
 }, {
   sequelize,
   timestamps: false,

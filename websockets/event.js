@@ -1,7 +1,7 @@
 const API = require('../api/event');
 
 exports.create = async function(packet){
-  return await API.create(packet.name, packet.donation_link);
+  return await API.create(packet.name, packet.donation_link. packet.date);
 };
 
 exports.get = async function(packet){
@@ -9,7 +9,7 @@ exports.get = async function(packet){
 };
 
 exports.update = async function(packet){
-  return await API.update(packet.id, packet.name, packet.donation_link);
+  return await API.update(packet.id, packet.name, packet.donation_link, packet.date);
 };
 
 exports.delete = async function(packet){
