@@ -96,6 +96,7 @@ module.exports = (server) => {
 let loggedFunctionsAdmin = {
   getUser: user.get,
   getUsers: user.getUsers,
+  getUserRuns: user.getUserRuns,
 
   removePermission: userPermission.removePermission,
   addPermission: userPermission.addPermission,
@@ -139,6 +140,7 @@ let loggedFunctionsAdmin = {
 let loggedFunctionsBase = {
   getUser: user.get,
   getUsers: user.getUsers,
+  getUserRuns: user.getUserRuns,
 
   createGame: game.create,
   getGame: game.get,

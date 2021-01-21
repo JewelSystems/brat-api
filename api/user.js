@@ -217,3 +217,12 @@ exports.getUsers = async function() {
   //Successful request
   return {"status": 200, "msg": "listUsers", data:[response.success]};
 };
+
+exports.getUserRuns = async function(id) {
+  let response = await Controller.getUserRuns(id);
+  if (response.error) {
+    return {"status": 403, "msg": response.error};
+  }
+  //Successful request
+  return {"status": 200, "msg": "listUserRuns", data:[response.success]};
+};

@@ -11,3 +11,7 @@ exports.signup = async function(packet){
 exports.getUsers = async function(){
   return await API.getUsers();
 };
+
+exports.getUserRuns = async function(packet){
+  return await API.getUserRuns(packet.id);
+};
