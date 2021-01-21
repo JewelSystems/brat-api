@@ -1,5 +1,6 @@
 const EventExtra = require('../models/EventExtra');
 const logger = require('../loaders/logger');
+const db = require('../loaders/sequelize');
 
 exports.create = async function(eventId, type, time) {
   logger.log("info", "Starting event extra create function");
@@ -63,10 +64,10 @@ exports.getExtras = async function() {
   logger.log("info", "Starting get all extras function");
   // Get extras
   try{
-    const extras = await EventExtra.findAll();
+    const extras = await db.query('SELECT event_extras.id, events.name, event_extras.type, event_extras.time FROM event_extras, events where event_extras.event_id = events.id');
     resp = [];
     for(let extra in extras){
-      resp.push(extras[extra].dataValues);
+      resp.push(extras[extra][0]);
     }
     return {success: resp};
   }catch(error){

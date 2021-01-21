@@ -1,7 +1,7 @@
 const API = require('../api/event');
 
 exports.create = async function(packet){
-  return await API.create(packet.name, packet.donation_link. packet.date);
+  return await API.create(packet.name, packet.donation_link, packet.date);
 };
 
 exports.get = async function(packet){

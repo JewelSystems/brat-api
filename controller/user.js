@@ -116,7 +116,6 @@ exports.getUserRuns = async function(id) {
   try{
     const sqlQuery = 'SELECT events.name as event, games.name as game, runs.category as category, runs.platform as platform, runs.preferred_time_slot as time_slot, submit_runs.waiting, submit_runs.reviewed, submit_runs.approved FROM run_runners, runs, games, submit_runs, events WHERE run_runners.runner_id = ' + id + ' AND runs.id = run_runners.run_id AND games.id = runs.game_id AND submit_runs.run_id = runs.id AND submit_runs.event_id = events.id';
     const userRuns = await db.query(sqlQuery);
-    console.log('aqui: ', userRuns);
     /*
     resp = [];
     for (run in userRuns[0]){

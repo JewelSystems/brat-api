@@ -1,5 +1,6 @@
 const Event = require('../models/Event');
 const logger = require('../loaders/logger');
+const db = require('../loaders/sequelize');
 
 exports.create = async function(name, donationLink, date) {
   logger.log("info", "Starting event create function");
