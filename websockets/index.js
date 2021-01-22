@@ -8,6 +8,7 @@ const runRunner = require('./runRunner');
 const event = require('./event');
 const eventExtra = require('./eventExtra');
 const eventRun = require('./eventRun');
+const eventSchedule = require('./eventSchedule');
 
 module.exports = (server) => {
   let counter = 0;
@@ -134,6 +135,8 @@ let loggedFunctionsAdmin = {
   getEventRun: eventRun.get,
   updateEventRun: eventRun.update,
   deleteEventRun: eventRun.delete,
+
+  getEventSchedule: eventSchedule.getEventSchedule,
 };
 
 // Logged User functions
@@ -160,6 +163,8 @@ let loggedFunctionsBase = {
 
   createEventRun: eventRun.create,
   getEventRun: eventRun.get,
+
+  getEventSchedule: eventSchedule.getEventSchedule,
 };
 
 // Unlogged Functions

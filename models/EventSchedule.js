@@ -1,5 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../loaders/sequelize');
+const EventRun = require('./EventRun');
+const EventExtra = require('./EventExtra');
 
 let EventSchedule = sequelize.define('EventSchedule', {
   id: {
@@ -18,29 +20,19 @@ let EventSchedule = sequelize.define('EventSchedule', {
   },
   event_id: {
     type: DataTypes.BIGINT(20),
-    references: 'events',
-    referencesKey: 'id',
     allowNull: false
   },
   event_run_id:{
     type: DataTypes.BIGINT(20),
-    references: 'event_runs',
-    referencesKey: 'id',
   },
   event_extra_id:{
     type: DataTypes.BIGINT(20),
-    references: 'event_extras',
-    referencesKey: 'id',
   },
   setup_time:{
     type: DataTypes.BIGINT(20)
   },
   extra_time:{
     type: DataTypes.BIGINT(20)
-  },
-  reviewed: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false
   },
   active: {
     type: DataTypes.BOOLEAN,
@@ -58,6 +50,14 @@ let EventSchedule = sequelize.define('EventSchedule', {
   timestamps: false,
   modelName: 'EventSchedule',
   tableName: 'event_schedule',
+});
+
+EventSchedule.belongsTo(EventRun, {
+  foreignKey: 'event_run_id',
+});
+
+EventSchedule.belongsTo(EventExtra, {
+  foreignKey: 'event_extra_id',
 });
 
 module.exports = EventSchedule;

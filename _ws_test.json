@@ -38,3 +38,23 @@
 {"function":"getEventRun", "data":{"id": "2"}}
 {"function":"updateEventRun", "data":{"id": 1, "event_id": "1", "run_id": "1", "date": "2021-01-18", "run_time": null}}
 {"function":"deleteEventRun", "data":{"id": 2}}
+
+//
+{
+  "id": "id da schedule",
+  "order": "order da schedule",
+  "type": "tipo da schedule",
+  "event_id": "id do evento",
+  "extra_time": "tempo extra pra qlq tipo de schedule",  
+  "active": "false",
+  "done": "false",
+  "final_time": null,
+
+  "game": "nome do jogo ou tipo do extra",
+  "duration": "tempo estimado do jogo ou time do extra ou setup_time",
+  "categoria": "categoria do jogo ou tipo do extra",
+  "platform": "plataforma do jogo ou todas p/ extra",
+  "runner": "runner daquele jogo ou todos p/ extra",
+
+
+}

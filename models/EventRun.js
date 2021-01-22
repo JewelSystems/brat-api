@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../loaders/sequelize');
+const Run = require('../models/Run');
 
 let EventRun = sequelize.define('EventRun', {
   id: {
@@ -10,14 +11,10 @@ let EventRun = sequelize.define('EventRun', {
   },
   event_id: {
     type: DataTypes.BIGINT(20),
-    references: 'events',
-    referencesKey: 'id',
     allowNull: false
   },
   run_id:{
     type: DataTypes.BIGINT(20),
-    references: 'runs',
-    referencesKey: 'id',
     allowNull: false
   },
   date: {
@@ -29,6 +26,10 @@ let EventRun = sequelize.define('EventRun', {
   timestamps: false,
   modelName: 'EventRun',
   tableName: 'event_runs',
+});
+
+EventRun.belongsTo(Run, {
+  foreignKey: 'run_id',
 });
 
 module.exports = EventRun;
