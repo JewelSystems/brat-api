@@ -39,7 +39,7 @@
 {"function":"updateEventRun", "data":{"id": 1, "event_id": "1", "run_id": "1", "date": "2021-01-18", "run_time": null}}
 {"function":"deleteEventRun", "data":{"id": 2}}
 
-//
+//schedule
 {
   "id": "id da schedule",
   "order": "order da schedule",
@@ -55,6 +55,7 @@
   "categoria": "categoria do jogo ou tipo do extra",
   "platform": "plataforma do jogo ou todas p/ extra",
   "runner": "runner daquele jogo ou todos p/ extra",
+  "stream_link": "link do runner ou null para os outros"
 
 
 }

@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../loaders/sequelize');
+const User = require('../models/User');
 
 let RunRunners = sequelize.define('RunRunners', {
   id: {
@@ -10,14 +11,10 @@ let RunRunners = sequelize.define('RunRunners', {
   },
   runner_id: {
     type: DataTypes.BIGINT(20),
-    references: 'users',
-    referencesKey: 'id',
     allowNull: false
   },
   run_id: {
     type: DataTypes.BIGINT(20),
-    references: 'runs',
-    referencesKey: 'id',
     allowNull: false
   },
 }, {
@@ -25,6 +22,10 @@ let RunRunners = sequelize.define('RunRunners', {
   timestamps: false,
   modelName: 'RunRunners',
   tableName: 'run_runners',
+});
+
+RunRunners.belongsTo(User, {
+  foreignKey: 'runner_id',
 });
 
 module.exports = RunRunners;

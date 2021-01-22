@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../loaders/sequelize');
 const Game = require('./Game');
+const RunRunner = require('./RunRunner');
 
 let Run = sequelize.define('Run', {
   id: {
@@ -39,5 +40,10 @@ let Run = sequelize.define('Run', {
 Run.belongsTo(Game, {
   foreignKey: 'game_id',
 });
+
+Run.hasMany(RunRunner, {
+  foreignKey: 'run_id'
+});
+
 
 module.exports = Run;
