@@ -12,6 +12,7 @@ const eventSchedule = require('./eventSchedule');
 
 module.exports = (server) => {
   let counter = 0;
+  let adminUsers = {};
   const wss = new ws.Server({ server });
 
   wss.on('connection', function connection(ws) {
@@ -64,6 +65,7 @@ module.exports = (server) => {
 
             if(ws.permissions.includes('Admin')){
               console.log("ADMIN");
+              adminUsers[ws.id] = ws;
               ws.functions = loggedFunctionsAdmin;
             }else{
               console.log('NOT ADMIN');
@@ -88,6 +90,9 @@ module.exports = (server) => {
     
     ws.on('close', async function close(){
       console.log('Connection Closed!');
+      if(adminUsers[ws.id]){
+        delete adminUsers[ws.id];
+      }
       ws.send('WebSocket Connection Ended!');
     });
   });

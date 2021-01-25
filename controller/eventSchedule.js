@@ -39,11 +39,12 @@ exports.getEventSchedule = async function() {
     resp = [];
     for(task in schedule){
       const values = schedule[task].dataValues;
-      let duration, game, category, platform, runner, streamLink;
+      let duration, game, category, interval, platform, runner, streamLink;
       if(values.setup_time) {
-        game = 'Intervalo';
+        game = 'Setup';
         duration = values.setup_time;
         category = null;
+        interval = null;
         platform = null;
         runner = null;
         streamLink = null;
@@ -52,6 +53,7 @@ exports.getEventSchedule = async function() {
         game = values.EventRun.Run.Game.name;
         duration = values.EventRun.Run.estimated_time;
         category = values.EventRun.Run.category;
+        interval = values.EventRun.Run.preferred_time_slot;
         platform = values.EventRun.Run.platform;
         runner = values.EventRun.Run.RunRunners[0].User.nickname;
         streamLink = values.EventRun.Run.RunRunners[0].User.stream_link;
@@ -60,6 +62,7 @@ exports.getEventSchedule = async function() {
         game = values.EventExtra.type;
         duration = values.EventExtra.time;
         category = values.EventExtra.type;
+        interval = null;
         platform = 'Todas';
         runner = 'Todos';
         streamLink = null;
@@ -82,6 +85,7 @@ exports.getEventSchedule = async function() {
         "game": game,
         "duration": duration,
         "category": category,
+        "interval": interval,
         "platform": platform,
         "runner": runner,
         "stream_link": streamLink,
