@@ -142,6 +142,7 @@ let loggedFunctionsAdmin = {
   deleteEventRun: eventRun.delete,
 
   getEventSchedule: eventSchedule.getEventSchedule,
+  updateEventSchedule: eventSchedule.updateEventSchedule,
 };
 
 // Logged User functions

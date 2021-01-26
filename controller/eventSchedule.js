@@ -91,9 +91,38 @@ exports.getEventSchedule = async function() {
         "stream_link": streamLink,
       });
     }
-    console.log(resp);
+    //console.log(resp);
     //console.log('aqui', JSON.stringify(schedule, null, 2));
     return {success: resp};
+  }catch(error){
+    console.log(error);
+    logger.log("error", "DB Error: " + JSON.stringify(error));
+    return {error: "Server error"};
+  }
+};
+
+exports.updateEventSchedule = async function(data) {
+  logger.log("info", "Starting update event schedule function");
+  // Get event schedule
+  try{
+    const dataJSON = JSON.parse(data);
+    for(let idx in dataJSON){
+      let element = dataJSON[idx];
+      console.log(element);
+      /*
+      await EventSchedule.update({
+        order: element.order,
+        type: element.type,
+        setup_time: element.setup_time,
+        extra_time: 
+
+
+      },{
+        where:{ id: element.id }
+      });
+      */
+    }
+    return {success: "sucesso"};
   }catch(error){
     console.log(error);
     logger.log("error", "DB Error: " + JSON.stringify(error));
