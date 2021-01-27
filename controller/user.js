@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const UserPermission = require('../models/UserPermission');
 const logger = require('../loaders/logger');
 
 const db = require('../loaders/sequelize');
@@ -28,6 +29,10 @@ exports.signup = async function(first_name, last_name, username, nickname, email
       status: '',
       created: '',
       updated: '',
+    });
+    await UserPermission.create({
+      user_id: user.id,
+      permission_id: 8,
     });
     Log.log(user.id, user.id, "user_create");
     return {success: 'Creation success'};

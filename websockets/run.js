@@ -1,7 +1,7 @@
 const API = require('../api/run');
 
 exports.create = async function(packet){
-  return await API.create(packet.runner_id, packet.game_id, packet.category, packet.estimated_time, packet.preferred_time_slot, packet.platform);
+  return await API.create(packet.runner_id, packet.game_id, packet.category, packet.estimated_time, packet.preferred_time_slot, packet.platform, packet.incentives);
 };
 
 exports.get = async function(packet){
@@ -17,5 +17,5 @@ exports.delete = async function(packet){
 };
 
 exports.createRunNGame = async function(packet){
-  return await API.createRunNGame(packet.runner_id, packet.category, packet.estimated_time, packet.preferred_time_slot, packet.platform, packet.name, packet.year);
+  return await API.createRunNGame(packet.runner_id, packet.category, packet.estimated_time, packet.preferred_time_slot, packet.platform, packet.name, packet.year, packet.incentives);
 };

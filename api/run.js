@@ -1,7 +1,7 @@
 const Controller = require('../controller/run');
 
-exports.create = async function(runnerId, gameId, category, estimatedTime, preferredTime, platform) {
-  let response = await Controller.create(runnerId, gameId, category, estimatedTime, preferredTime, platform);
+exports.create = async function(runnerId, gameId, category, estimatedTime, preferredTime, platform, incentives) {
+  let response = await Controller.create(runnerId, gameId, category, estimatedTime, preferredTime, platform, incentives);
   if (response.error) {
     return {"status": 403, "msg": response.error};
   }
@@ -36,8 +36,8 @@ exports.delete = async function(id) {
   return {"status": 200, "msg": "deleteRun", data:[response.success]};
 };
 
-exports.createRunNGame = async function(runnerId, category, estimatedTime, preferredTime, platform, name, year) {
-  let response = await Controller.createRunNGame(runnerId, category, estimatedTime, preferredTime, platform, name, year);
+exports.createRunNGame = async function(runnerId, category, estimatedTime, preferredTime, platform, name, year, incentives) {
+  let response = await Controller.createRunNGame(runnerId, category, estimatedTime, preferredTime, platform, name, year, incentives);
   if (response.error) {
     return {"status": 403, "msg": response.error};
   }

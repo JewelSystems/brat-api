@@ -2,9 +2,10 @@ const Run = require('../models/Run');
 const Game = require('../models/Game');
 const RunRunner = require('../models/RunRunner');
 const SubmitRun = require('../models/SubmitRun');
+const RunIncentive = require('../models/RunIncentive');
 const logger = require('../loaders/logger');
 
-exports.create = async function(runnerId, gameId, category, estimatedTime, preferredTime, platform) {
+exports.create = async function(runnerId, gameId, category, estimatedTime, preferredTime, platform, incentives) {
   logger.log("info", "Starting run create function");
   // Create run
   try{
@@ -26,6 +27,13 @@ exports.create = async function(runnerId, gameId, category, estimatedTime, prefe
       approved: false,
       waiting: false
     });
+    for(let idx in incentives){
+      await RunIncentive.create({
+        run_id: run.id,
+        type: incentives[idx].type,
+        comment: incentives[idx].comment,
+      });
+    }
     return {success: 'Creation success'};
   }catch(error){
     logger.log("error", "DB Error: " + JSON.stringify(error));
@@ -77,7 +85,7 @@ exports.delete = async function(id) {
   }
 };
 
-exports.createRunNGame = async function(runnerId, category, estimatedTime, preferredTime, platform, name, year) {
+exports.createRunNGame = async function(runnerId, category, estimatedTime, preferredTime, platform, name, year, incentives) {
   logger.log("info", "Starting run and game create function");
   // Create run and game
   try{
@@ -103,6 +111,13 @@ exports.createRunNGame = async function(runnerId, category, estimatedTime, prefe
       approved: false,
       waiting: false
     });
+    for(let idx in incentives){
+      await RunIncentive.create({
+        run_id: run.id,
+        type: incentives[idx].type,
+        comment: incentives[idx].comment,
+      });
+    }
     return {success: 'Creation success'};
   }catch(error){
     logger.log("error", "DB Error: " + JSON.stringify(error));
