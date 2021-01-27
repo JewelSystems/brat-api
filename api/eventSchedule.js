@@ -27,8 +27,8 @@ exports.deleteEventSchedule = async function(id) {
   return {"status": 200, "msg": "deleteEventSchedule", data:[response.success], "type": "broadcast"};
 };
 
-exports.createSetupEventSchedule = async function(duration, event_id, type, order, data) {
-  let response = await Controller.createSetupEventSchedule(duration, event_id, type, order, data);
+exports.createSetupEventSchedule = async function(data, setups) {
+  let response = await Controller.createSetupEventSchedule(data, setups);
   if (response.error) {
     return {"status": 403, "msg": response.error};
   }

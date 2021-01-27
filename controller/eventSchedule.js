@@ -137,24 +137,26 @@ exports.deleteEventSchedule = async function(id) {
   }
 };
 
-exports.createSetupEventSchedule = async function(duration, event_id, type, order, data) {
+exports.createSetupEventSchedule = async function(data, setups) {
   logger.log("info", "Starting create setup on event schedule function");
   // Get event schedule
   try{
-    eventSchedule = await EventSchedule.create({
-      "order": order,
-      "type": type,
-      "event_id": event_id,
-      "setup_time": duration,
-      "active": false,
-      "done": false,
-    });
-
+    console.log(data);
     const dataJSON = JSON.parse(data);
-    dataJSON.find(element => element.order === eventSchedule.order).id = eventSchedule.id;
-    
-    console.log(dataJSON);
-
+    for(let idx in setups){
+      let setup = setups[idx];
+      eventSchedule = await EventSchedule.create({
+        "order": setup.order,
+        "type": setup.type,
+        "event_id": setup.event_id,
+        "setup_time": setup.duration,
+        "active": false,
+        "done": false,
+      });
+      dataJSON.find(element => element.order === eventSchedule.order).id = eventSchedule.id;
+      
+      console.log(dataJSON);
+    }
     await this.updateEventSchedule(JSON.stringify(dataJSON));
     resp = await this.getEventSchedule();
     return {success: resp};
