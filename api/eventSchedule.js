@@ -15,5 +15,23 @@ exports.updateEventSchedule = async function(data) {
     return {"status": 403, "msg": response.error};
   }
   //Successful request
-  return {"status": 200, "msg": "updateEventSchedule", data:[response.success]};
+  return {"status": 200, "msg": "updateEventSchedule", data:[response.success], "type": "broadcast"};
+};
+
+exports.deleteEventSchedule = async function(id) {
+  let response = await Controller.deleteEventSchedule(id);
+  if (response.error) {
+    return {"status": 403, "msg": response.error};
+  }
+  //Successful request
+  return {"status": 200, "msg": "deleteEventSchedule", data:[response.success], "type": "broadcast"};
+};
+
+exports.createSetupEventSchedule = async function(duration, event_id, type, order, data) {
+  let response = await Controller.createSetupEventSchedule(duration, event_id, type, order, data);
+  if (response.error) {
+    return {"status": 403, "msg": response.error};
+  }
+  //Successful request
+  return {"status": 200, "msg": "createSetupEventSchedule", data:[response.success], "type": "broadcast"};
 };

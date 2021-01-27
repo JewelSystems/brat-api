@@ -81,11 +81,21 @@ module.exports = (server) => {
           packet = {"endpoint": endpoint, "id": id, "info":{"status": "403", "msg": "Undefined endpoint"}};
         }else{
           packet = await ws.functions[endpoint](info);
-          packet = {"endpoint": endpoint, "id": id, "info":{"status": packet.status, "msg": packet.msg}, "data":packet.data};
+          packet = {"endpoint": endpoint, "id": id, "info":{"status": packet.status, "msg": packet.msg}, "data":packet.data, "type":packet.type};
         }
       }
       //console.log("Sent: ", packet);
-      ws.send(JSON.stringify(packet));
+      if(packet.type === "broadcast"){
+        //Broadcast
+        wss.clients.forEach(function each(client) {
+          if (client.readyState === ws.OPEN) {
+            client.send(JSON.stringify(packet));
+          }
+        });
+      }else{
+        //Unicast
+        ws.send(JSON.stringify(packet));
+      }
     });
     
     ws.on('close', async function close(){
@@ -143,6 +153,8 @@ let loggedFunctionsAdmin = {
 
   getEventSchedule: eventSchedule.getEventSchedule,
   updateEventSchedule: eventSchedule.updateEventSchedule,
+  deleteEventSchedule: eventSchedule.deleteEventSchedule,
+  createSetupEventSchedule: eventSchedule.createSetupEventSchedule
 };
 
 // Logged User functions

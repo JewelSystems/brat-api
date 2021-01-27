@@ -103,26 +103,61 @@ exports.getEventSchedule = async function() {
 
 exports.updateEventSchedule = async function(data) {
   logger.log("info", "Starting update event schedule function");
-  // Get event schedule
+  // update event schedule
   try{
     const dataJSON = JSON.parse(data);
     for(let idx in dataJSON){
       let element = dataJSON[idx];
-      console.log(element);
-      /*
       await EventSchedule.update({
         order: element.order,
-        type: element.type,
-        setup_time: element.setup_time,
-        extra_time: 
-
-
       },{
         where:{ id: element.id }
       });
-      */
     }
-    return {success: "sucesso"};
+    resp = await this.getEventSchedule();
+    return {success: resp};
+  }catch(error){
+    console.log(error);
+    logger.log("error", "DB Error: " + JSON.stringify(error));
+    return {error: "Server error"};
+  }
+};
+
+exports.deleteEventSchedule = async function(id) {
+  logger.log("info", "Starting delete event schedule function");
+  // delete event schedule
+  try{
+    await EventSchedule.destroy({where:{id}});
+    resp = await this.getEventSchedule();
+    return {success: resp};
+  }catch(error){
+    console.log(error);
+    logger.log("error", "DB Error: " + JSON.stringify(error));
+    return {error: "Server error"};
+  }
+};
+
+exports.createSetupEventSchedule = async function(duration, event_id, type, order, data) {
+  logger.log("info", "Starting create setup on event schedule function");
+  // Get event schedule
+  try{
+    eventSchedule = await EventSchedule.create({
+      "order": order,
+      "type": type,
+      "event_id": event_id,
+      "setup_time": duration,
+      "active": false,
+      "done": false,
+    });
+
+    const dataJSON = JSON.parse(data);
+    dataJSON.find(element => element.order === eventSchedule.order).id = eventSchedule.id;
+    
+    console.log(dataJSON);
+
+    await this.updateEventSchedule(JSON.stringify(dataJSON));
+    resp = await this.getEventSchedule();
+    return {success: resp};
   }catch(error){
     console.log(error);
     logger.log("error", "DB Error: " + JSON.stringify(error));

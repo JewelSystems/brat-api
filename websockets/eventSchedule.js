@@ -7,3 +7,11 @@ exports.getEventSchedule = async function(){
 exports.updateEventSchedule = async function(packet){
   return await API.updateEventSchedule(packet.data);
 };
+
+exports.deleteEventSchedule = async function(packet){
+  return await API.deleteEventSchedule(packet.id);
+};
+
+exports.createSetupEventSchedule = async function(packet){
+  return await API.createSetupEventSchedule(packet.duration, packet.event_id, packet.type, packet.order, packet.data);
+};
