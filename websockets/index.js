@@ -84,8 +84,12 @@ module.exports = (server) => {
           packet = {"endpoint": endpoint, "id": id, "info":{"status": packet.status, "msg": packet.msg}, "data":packet.data, "type":packet.type};
         }
       }
-      //console.log("Sent: ", packet);
-      if(packet.type === "broadcast"){
+      //Admin Broadcast
+      if(packet.type === "adminBroadcast"){
+        for(let user in adminUsers){
+          adminUsers[user].send(JSON.stringify(packet));
+        }
+      }else if(packet.type === "broadcast"){
         //Broadcast
         wss.clients.forEach(function each(client) {
           if (client.readyState === ws.OPEN) {

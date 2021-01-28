@@ -15,7 +15,7 @@ exports.updateEventSchedule = async function(data) {
     return {"status": 403, "msg": response.error};
   }
   //Successful request
-  return {"status": 200, "msg": "updateEventSchedule", data:[response.success], "type": "broadcast"};
+  return {"status": 200, "msg": "updateEventSchedule", data:[response.success], "type": "adminBroadcast"};
 };
 
 exports.deleteEventSchedule = async function(id) {
@@ -24,7 +24,7 @@ exports.deleteEventSchedule = async function(id) {
     return {"status": 403, "msg": response.error};
   }
   //Successful request
-  return {"status": 200, "msg": "deleteEventSchedule", data:[response.success], "type": "broadcast"};
+  return {"status": 200, "msg": "deleteEventSchedule", data:[response.success], "type": "adminBroadcast"};
 };
 
 exports.createSetupEventSchedule = async function(data, setups) {
@@ -33,5 +33,5 @@ exports.createSetupEventSchedule = async function(data, setups) {
     return {"status": 403, "msg": response.error};
   }
   //Successful request
-  return {"status": 200, "msg": "createSetupEventSchedule", data:[response.success], "type": "broadcast"};
+  return {"status": 200, "msg": "createSetupEventSchedule", data:[response.success], "type": "adminBroadcast"};
 };
