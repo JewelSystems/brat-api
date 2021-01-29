@@ -51,7 +51,7 @@ exports.delete = async function(id) {
   logger.log("info", "Starting event run delete function");
   // Delete event run
   try{
-    let eventRun = await EventRun.destroy({where:{id}});
+    let eventRun = await EventRun.destroy({where:{run_id: id}});
     return {success: eventRun};
   }catch(error){
     logger.log("error", "DB Error: " + JSON.stringify(error));

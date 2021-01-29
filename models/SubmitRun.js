@@ -1,5 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../loaders/sequelize');
+const Event = require('./Event');
+const Run = require('./Run');
 
 let SubmitRun = sequelize.define('SubmitRun', {
   id: {
@@ -37,6 +39,14 @@ let SubmitRun = sequelize.define('SubmitRun', {
   timestamps: false,
   modelName: 'SubmitRun',
   tableName: 'submit_runs',
+});
+
+SubmitRun.belongsTo(Event, {
+  foreignKey: 'event_id',
+});
+
+SubmitRun.belongsTo(Run, {
+  foreignKey: 'run_id',
 });
 
 module.exports = SubmitRun;

@@ -4,6 +4,7 @@ const auth = require('./auth');
 const userPermission = require('./userPermission');
 const game = require('./game');
 const run = require('./run');
+const submitRun = require('./submitRun');
 const runRunner = require('./runRunner');
 const event = require('./event');
 const eventExtra = require('./eventExtra');
@@ -158,7 +159,10 @@ let loggedFunctionsAdmin = {
   getEventSchedule: eventSchedule.getEventSchedule,
   updateEventSchedule: eventSchedule.updateEventSchedule,
   deleteEventSchedule: eventSchedule.deleteEventSchedule,
-  createSetupEventSchedule: eventSchedule.createSetupEventSchedule
+  createSetupEventSchedule: eventSchedule.createSetupEventSchedule,
+
+  getSubmitRuns: submitRun.getSubmitRuns,
+  updateSubmitRun: submitRun.updateSubmitRun,
 };
 
 // Logged User functions
