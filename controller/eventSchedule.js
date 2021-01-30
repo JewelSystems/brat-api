@@ -80,7 +80,7 @@ exports.getEventSchedule = async function() {
         "final_time": values.final_time,
 
         "event_name": values.Event.name,
-        "event_date": values.Event.date,
+        "event_date": values.Event.start,
         
         "game": game,
         "duration": duration,

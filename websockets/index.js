@@ -144,6 +144,7 @@ let loggedFunctionsAdmin = {
   updateEvent: event.update,
   deleteEvent: event.delete,
   getEvents: event.getEvents,
+  updateEventState: event.updateEventState,
 
   createEventExtra: eventExtra.create,
   getEventExtra: eventExtra.get,

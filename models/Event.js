@@ -17,10 +17,14 @@ let Event = sequelize.define('Event', {
     allowNull: false
   },  
   active: {
-    type: DataTypes.BOOLEAN,
+    type: DataTypes.STRING(1),
     allowNull: false
   },
-  date: {
+  start: {
+    type: DataTypes.DATE,
+    allowNull: false
+  },
+  end: {
     type: DataTypes.DATE,
     allowNull: false
   }
