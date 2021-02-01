@@ -1,5 +1,6 @@
 const Event = require('../models/Event');
 const logger = require('../loaders/logger');
+const moment = require('moment');
 
 exports.create = async function(name, donationLink, start, end) {
   logger.log("info", "Starting event create function");
@@ -12,8 +13,15 @@ exports.create = async function(name, donationLink, start, end) {
       end: end,
       active: "N",
     });
-    
-    return {success: event};
+    const resp = {
+      id: event.id,
+      name: event.name,
+      donation_link: event.donation_link,
+      start: moment(event.start).format("YYYY[-]MM[-]DD"),
+      end: moment(event.end).format("YYYY[-]MM[-]DD"),
+      active: event.active
+    };
+    return {success: resp};
   }catch(error){
     logger.log("error", "DB Error: " + JSON.stringify(error));
     return {error: "Server error"};
@@ -44,8 +52,19 @@ exports.update = async function(id, name, donationLink, start, end) {
     },{
       where:{id}
     });
-    return {success: 'Update success'};
+    const event = await Event.findOne({ where:{id} });
+    const resp = {
+      id: event.id,
+      name: event.name,
+      donation_link: event.donation_link,
+      start: moment(event.start).format("YYYY[-]MM[-]DD"),
+      end: moment(event.end).format("YYYY[-]MM[-]DD"),
+      active: event.active
+    };
+    return {success: resp};
+
   }catch(error){
+    console.log(error);
     logger.log("error", "DB Error: " + JSON.stringify(error));
     return {error: "Server error"};
   }

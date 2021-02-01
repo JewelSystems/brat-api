@@ -24,7 +24,7 @@ exports.update = async function(id, name, donationLink, start, end) {
     return {"status": 403, "msg": response.error};
   }
   //Successful request
-  return {"status": 200, "msg": "updateEvent", data:[response.success]};
+  return {"status": 200, "msg": "updateEvent", data:[response.success], "type": "adminBroadcast"};
 };
 
 exports.delete = async function(id) {
