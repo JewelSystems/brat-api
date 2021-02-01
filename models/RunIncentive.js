@@ -13,13 +13,17 @@ let RunIncentive = sequelize.define('RunIncentive', {
     allowNull: false
   },
   type: {
-    type: DataTypes.STRING(100),
+    type: DataTypes.STRING(50),
     allowNull: false
   },  
   comment: {
     type: DataTypes.STRING(300),
     allowNull: false
   },
+  name:{
+    type: DataTypes.STRING(50),
+    allowNull: false
+  }
 }, {
   sequelize,
   timestamps: false,

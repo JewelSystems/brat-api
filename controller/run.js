@@ -3,6 +3,7 @@ const Game = require('../models/Game');
 const RunRunner = require('../models/RunRunner');
 const SubmitRun = require('../models/SubmitRun');
 const RunIncentive = require('../models/RunIncentive');
+const BidwarOption = require('../models/BidwarOption');
 const logger = require('../loaders/logger');
 
 exports.create = async function(runnerId, gameId, category, estimatedTime, preferredTime, platform, incentives) {
@@ -28,11 +29,20 @@ exports.create = async function(runnerId, gameId, category, estimatedTime, prefe
       waiting: false
     });
     for(let idx in incentives){
-      await RunIncentive.create({
+      const incentive = await RunIncentive.create({
         run_id: run.id,
         type: incentives[idx].type,
         comment: incentives[idx].comment,
+        name: incentives[idx].name,
       });
+      if(incentives[idx].type === 'private'){
+        for(let option in incentives[idx].options){
+          await BidwarOption.create({
+            incentive_id: incentive.id,
+            option: incentives[idx].options[option].name,
+          });
+        }
+      }
     }
     return {success: 'Creation success'};
   }catch(error){
