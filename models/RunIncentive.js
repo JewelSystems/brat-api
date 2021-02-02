@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../loaders/sequelize');
+const BidwarOption = require('./BidwarOption');
 
 let RunIncentive = sequelize.define('RunIncentive', {
   id: {
@@ -29,6 +30,10 @@ let RunIncentive = sequelize.define('RunIncentive', {
   timestamps: false,
   modelName: 'RunIncentive',
   tableName: 'run_incentives',
+});
+
+RunIncentive.hasMany(BidwarOption, {
+  foreignKey: 'incentive_id'
 });
 
 module.exports = RunIncentive;

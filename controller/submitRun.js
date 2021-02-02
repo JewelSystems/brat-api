@@ -4,6 +4,8 @@ const Run = require('../models/Run');
 const Game = require('../models/Game');
 const RunRunner = require('../models/RunRunner');
 const User = require('../models/User');
+const RunIncentive = require('../models/RunIncentive');
+const BidwarOption = require('../models/BidwarOption');
 
 const eventRunController = require('../controller/eventRun');
 
@@ -26,6 +28,11 @@ exports.getSubmitRuns = async function() {
           include: {
             model: User
           }
+        },{
+          model: RunIncentive,
+          include: {
+            model: BidwarOption
+          }
         }]
       }]
     });
@@ -43,8 +50,13 @@ exports.getSubmitRuns = async function() {
         "reviewed": value.reviewed,
         "approved": value.approved,
         "waiting": value.waiting,
-        "runner": value.Run.RunRunners[0].User.nickname
+        "runner": value.Run.RunRunners[0].User.nickname,
+        "incentives": []
       });
+      for(incentiveIdx in value.Run.RunIncentives){
+        incentive = value.Run.RunIncentives[incentiveIdx].dataValues;
+        resp[submitRun].incentives.push(incentive);
+      }
     }
 
     return {success: resp};

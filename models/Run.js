@@ -2,6 +2,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../loaders/sequelize');
 const Game = require('./Game');
 const RunRunner = require('./RunRunner');
+const RunIncentive = require('./RunIncentive');
 
 let Run = sequelize.define('Run', {
   id: {
@@ -42,6 +43,10 @@ Run.belongsTo(Game, {
 });
 
 Run.hasMany(RunRunner, {
+  foreignKey: 'run_id'
+});
+
+Run.hasMany(RunIncentive, {
   foreignKey: 'run_id'
 });
 
