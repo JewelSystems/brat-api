@@ -56,22 +56,21 @@ exports.getSubmitRuns = async function() {
         "waiting": value.waiting,
         "runner": value.Run.RunRunners[0].User.nickname,
         "incentives": [],
-        "approved_incentives": []
+        "approved_incentives": {}
       });
       for(incentiveIdx in value.Run.RunIncentives){
         incentive = value.Run.RunIncentives[incentiveIdx].dataValues;
         resp[submitRun].incentives.push(incentive);
       }
-      if(value.approved && resp[submitRun].incentives.length > 0){
+      if(value.reviewed && resp[submitRun].incentives.length > 0){
         for(incentive in resp[submitRun].incentives){
           const incentiveFound = await EventRunIncentive.findOne({ where:{ incentive_id: resp[submitRun].incentives[incentive].id } });
-          if(incentiveFound) resp[submitRun].approved_incentives.push(resp[submitRun].incentives[incentive].id);
+          if(incentiveFound) resp[submitRun].approved_incentives[resp[submitRun].incentives[incentive].id] = true;
+          else resp[submitRun].approved_incentives[resp[submitRun].incentives[incentive].id] = false;
         }
       }
     }
-    
-    
-    
+
     return {success: resp};
   }catch(error){
     console.log(error);
@@ -101,18 +100,28 @@ exports.update = async function(id, reviewed, approved, waiting) {
     };
 
     //Create or remove evaluated submitted runs from event_runs table.
+    let newEvtRun = null;
     let evtRun = null;
     if(approved){
-      if(waiting){
-        evtRun = await eventRunController.create(submitRun.dataValues.event_id, submitRun.dataValues.run_id, '01-01-2021');
-      }else{
-        evtRun = await eventRunController.create(submitRun.dataValues.event_id, submitRun.dataValues.run_id, '01-01-2021');
+      evtRun = await EventRun.findOne({
+        raw: true,
+        where:{
+          run_id: submitRun.dataValues.run_id
+        }
+      });
+      if(!evtRun){
+        if(waiting){
+          newEvtRun = await eventRunController.create(submitRun.dataValues.event_id, submitRun.dataValues.run_id, '01-01-2021');
+        }else{
+          newEvtRun = await eventRunController.create(submitRun.dataValues.event_id, submitRun.dataValues.run_id, '01-01-2021');
+        }
       }
     }else{
       await eventRunController.delete(submitRun.dataValues.run_id);
     }
 
-    if(evtRun) resp.event_run_id = evtRun.success.dataValues.id;
+    if(newEvtRun) resp.event_run = newEvtRun.success.dataValues;
+    else resp.event_run = evtRun;
 
     return {success: resp};
   }catch(error){
@@ -127,41 +136,51 @@ exports.updateSubmitRunNRunIncentives = async function(id, reviewed, approved, w
   // Update submit run
   try{
     let eventRunId = await this.update(id, reviewed, approved, waiting);
-    eventRunId = eventRunId.success;
-    let approvedIncentives = [];
+    eventRunInfo = eventRunId.success;
+    let approvedIncentives = {};
 
-    for(idx in incentives){
-      //If the incentive already exists, update.
-      const found = await EventRunIncentive.findOne({ where:{incentive_id: incentives[idx].id} });
-      if(found){
-        await EventRunIncentive.update({
-          "event_run_id": eventRunId.event_run_id,
-          "incentive_id": incentives[idx].id,
-          "goal": 100//Number(incentives[idx].goal),
-        },
-        { 
-          where:{incentive_id: incentives[idx].id} 
-        });
-      }else{
-        //If the incentive wasn't found, create.
-        const eventRunIncentive = await EventRunIncentive.create({
-          "event_run_id": eventRunId.event_run_id,
-          "incentive_id": incentives[idx].id,
-          "cur_value": 0,
-          "goal": Number(incentives[idx].goal),
-        });
-        
-        if(incentives[idx].options && incentives[idx].options.length > 0){
-          for(option in incentives[idx].options){
-            await EventRunBidwarOption.create({
-              "event_run_incentive_id": eventRunIncentive.id,
-              "bidwar_option_id": incentives[idx].options[option].id,
-              "cur_value": 0
-            });
+    allIncentives = await RunIncentive.findAll({ raw: true, where:{run_id: eventRunInfo.event_run.run_id} });
+
+    for(idx in allIncentives){
+      const curIncentive = await incentives.filter(element => element.id === allIncentives[idx].id);
+      const found = await EventRunIncentive.findOne({ where:{incentive_id: allIncentives[idx].id} });
+      if(curIncentive.length > 0){
+        if(found){
+          await EventRunIncentive.update({
+            "event_run_id": eventRunInfo.event_run.id,
+            "incentive_id": curIncentive[0].id,
+            "goal": Number(curIncentive[0].goal),
+          },
+          { 
+            where:{incentive_id: curIncentive[0].id} 
+          });
+        }else{
+          //If the incentive wasn't found, create.
+          const eventRunIncentive = await EventRunIncentive.create({
+            "event_run_id": eventRunInfo.event_run.id,
+            "incentive_id": curIncentive[0].id,
+            "cur_value": 0,
+            "goal": Number(curIncentive[0].goal),
+          });
+          
+          if(curIncentive[0].options && curIncentive[0].options.length > 0){
+            for(option in curIncentive[0].options){
+              await EventRunBidwarOption.create({
+                "event_run_incentive_id": eventRunIncentive.id,
+                "bidwar_option_id": curIncentive[0].options[option].id,
+                "cur_value": 0
+              });
+            }
           }
         }
+        approvedIncentives[allIncentives[idx].id] = true;      
+      }else{
+        if(found){
+          await EventRunBidwarOption.destroy({ where:{event_run_incentive_id: found.dataValues.id }});
+          await EventRunIncentive.destroy({ where:{incentive_id: allIncentives[idx].id }});
+        }
+        approvedIncentives[allIncentives[idx].id] = false;
       }
-      approvedIncentives.push(incentives[idx].id);
     }
 
     resp = {
@@ -200,15 +219,16 @@ exports.refuseSubmitRunNRemoveIncentives = async function(id, reviewed, approved
       waiting: submitRun.dataValues.waiting,
     };
 
+    //TODO atualizar array de approve quando remover
     const eventRun = await EventRun.findOne({ where:{run_id: submitRun.dataValues.run_id} });
     if(eventRun){
-      const incentives = await EventRunIncentive.findAll({ where:{ event_run_id: eventRun.dataValues.id } });
+      const incentives = await EventRunIncentive.findAll({ raw: true, where:{ event_run_id: eventRun.dataValues.id } });
       for(incentive in incentives){
-        const options = await EventRunBidwarOption.findAll({ where:{ event_run_incentive_id: incentives[incentive].dataValues.id } });
+        const options = await EventRunBidwarOption.findAll({ where:{ event_run_incentive_id: incentives[incentive].id } });
         for(option in options){
           await EventRunBidwarOption.destroy({ where:{ id:options[option].dataValues.id } });
         }
-        await EventRunIncentive.destroy({ where:{ id:incentives[incentive].dataValues.id } });
+        await EventRunIncentive.destroy({ where:{ id:incentives[incentive].id } });
       }
       await eventRunController.delete(submitRun.dataValues.run_id);
     }
