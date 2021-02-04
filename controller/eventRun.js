@@ -5,12 +5,12 @@ exports.create = async function(eventId, runId, date) {
   logger.log("info", "Starting event run create function");
   // Create event run
   try{
-    await EventRun.create({
+    const eventRun = await EventRun.create({
       event_id: eventId,
       run_id: runId,
       date: date,
     });
-    return {success: 'Creation success'};
+    return {success: eventRun};
   }catch(error){
     logger.log("error", "DB Error: " + JSON.stringify(error));
     return {error: "Server error"};

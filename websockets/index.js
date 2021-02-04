@@ -164,6 +164,8 @@ let loggedFunctionsAdmin = {
 
   getSubmitRuns: submitRun.getSubmitRuns,
   updateSubmitRun: submitRun.updateSubmitRun,
+  updateSubmitRunNRunIncentives: submitRun.updateSubmitRunNRunIncentives,
+  refuseSubmitRunNRemoveIncentives: submitRun.refuseSubmitRunNRemoveIncentives,
 };
 
 // Logged User functions
