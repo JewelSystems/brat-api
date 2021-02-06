@@ -10,6 +10,7 @@ const event = require('./event');
 const eventExtra = require('./eventExtra');
 const eventRun = require('./eventRun');
 const eventSchedule = require('./eventSchedule');
+const runIncentive = require('./runIncentive');
 
 module.exports = (server) => {
   let counter = 0;
@@ -166,6 +167,9 @@ let loggedFunctionsAdmin = {
   updateSubmitRun: submitRun.updateSubmitRun,
   updateSubmitRunNRunIncentives: submitRun.updateSubmitRunNRunIncentives,
   refuseSubmitRunNRemoveIncentives: submitRun.refuseSubmitRunNRemoveIncentives,
+
+  updateIncentive: runIncentive.update,
+  getRunIncentives: runIncentive.getRunIncentives,
 };
 
 // Logged User functions

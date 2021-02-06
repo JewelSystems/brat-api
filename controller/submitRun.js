@@ -56,7 +56,8 @@ exports.getSubmitRuns = async function() {
         "waiting": value.waiting,
         "runner": value.Run.RunRunners[0].User.nickname,
         "incentives": [],
-        "approved_incentives": {}
+        "approved_incentives": {},
+        "goals": {}
       });
       for(incentiveIdx in value.Run.RunIncentives){
         incentive = value.Run.RunIncentives[incentiveIdx].dataValues;
@@ -65,8 +66,12 @@ exports.getSubmitRuns = async function() {
       if(value.reviewed && resp[submitRun].incentives.length > 0){
         for(incentive in resp[submitRun].incentives){
           const incentiveFound = await EventRunIncentive.findOne({ where:{ incentive_id: resp[submitRun].incentives[incentive].id } });
-          if(incentiveFound) resp[submitRun].approved_incentives[resp[submitRun].incentives[incentive].id] = true;
-          else resp[submitRun].approved_incentives[resp[submitRun].incentives[incentive].id] = false;
+          if(incentiveFound) { 
+            resp[submitRun].approved_incentives[resp[submitRun].incentives[incentive].id] = true;
+            if(incentiveFound.dataValues.goal !== 0) resp[submitRun].goals[resp[submitRun].incentives[incentive].id] = incentiveFound.dataValues.goal;
+          }else{
+            resp[submitRun].approved_incentives[resp[submitRun].incentives[incentive].id] = false;
+          }
         }
       }
     }
@@ -138,6 +143,7 @@ exports.updateSubmitRunNRunIncentives = async function(id, reviewed, approved, w
     let eventRunId = await this.update(id, reviewed, approved, waiting);
     eventRunInfo = eventRunId.success;
     let approvedIncentives = {};
+    let goals = {};
 
     allIncentives = await RunIncentive.findAll({ raw: true, where:{run_id: eventRunInfo.event_run.run_id} });
 
@@ -173,7 +179,8 @@ exports.updateSubmitRunNRunIncentives = async function(id, reviewed, approved, w
             }
           }
         }
-        approvedIncentives[allIncentives[idx].id] = true;      
+        approvedIncentives[allIncentives[idx].id] = true;
+        if(curIncentive[0].goal !== 0) goals[allIncentives[idx].id] = curIncentive[0].goal;
       }else{
         if(found){
           await EventRunBidwarOption.destroy({ where:{event_run_incentive_id: found.dataValues.id }});
@@ -189,6 +196,7 @@ exports.updateSubmitRunNRunIncentives = async function(id, reviewed, approved, w
       approved: approved,
       waiting: waiting,
       approved_incentives: approvedIncentives,
+      goals: goals
     };
 
     return {success: resp};
