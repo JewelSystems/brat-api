@@ -3,9 +3,10 @@ const express = require('express');
 const bp = require('body-parser');
 const helmet = require('helmet');
 const cors = require('cors');
+const http = require('http');
+
 const routes = require('./routes');
 const logger = require('./loaders/logger');
-const http = require('http');
 
 const app = express();
 const port = 3000;
@@ -39,9 +40,3 @@ server.listen(port, () => {
 
 // Websocket
 require('./websockets')(server);
-
-/*
-app.listen(port, () => {
-  logger.log("info", `BrAT listening at http://localhost:${port}`);
-});
-*/

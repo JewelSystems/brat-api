@@ -67,15 +67,17 @@ exports.getRunIncentives = async function(scheduleId) {
     resp = [];
 
     for(idx in incentives){
-      let found = resp.find(element => element.id === incentives[idx].id);
-      if(found){
-        found.options.push(incentives[idx].option);
-      }else{
-        resp.push({
-          "id": incentives[idx].id,
-          "incentive": incentives[idx].name,
-          "options": incentives[idx].option !== null ? [incentives[idx].option] : []
-        });
+      if(incentives[idx].id !== null){
+        let found = resp.find(element => element.id === incentives[idx].id);
+        if(found){
+          found.options.push(incentives[idx].option);
+        }else{
+          resp.push({
+            "id": incentives[idx].id,
+            "incentive": incentives[idx].name,
+            "options": incentives[idx].option !== null ? [incentives[idx].option] : []
+          });
+        }
       }
     }
 
