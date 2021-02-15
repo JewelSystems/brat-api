@@ -11,8 +11,8 @@ module.exports = {
   },
   sequelize: {
     database: 'brat',
-    username: 'root',
-    password: 'root',
+    username: 'siteUser',
+    password: 'N0Tweak$_@123!',
     options: {
       dialect: 'mysql',
       raw: true,
