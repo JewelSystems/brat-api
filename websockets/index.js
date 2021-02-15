@@ -130,10 +130,10 @@ let loggedFunctionsAdmin = {
   getGames: game.getGames,
 
   createRun: run.create,
+  createRunNGame: run.createRunNGame,
   getRun: run.get,
   updateRun: run.update,
   deleteRun: run.delete,
-  createRunNGame: run.createRunNGame,
 
   createRunRunner: runRunner.create,
   getRunRunner: runRunner.get,
@@ -183,6 +183,7 @@ let loggedFunctionsBase = {
   getGames: game.getGames,
 
   createRun: run.create,
+  createRunNGame: run.createRunNGame,
   getRun: run.get,
 
   getRunRunner: runRunner.get,

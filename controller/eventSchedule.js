@@ -93,6 +93,7 @@ exports.getEventSchedule = async function() {
     }
     //console.log(resp);
     //console.log('aqui', JSON.stringify(schedule, null, 2));
+    console.log(resp);
     return {success: resp};
   }catch(error){
     console.log(error);

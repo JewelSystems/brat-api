@@ -30,10 +30,12 @@ exports.signup = async function(first_name, last_name, username, nickname, email
       created: '',
       updated: '',
     });
+    
     await UserPermission.create({
       user_id: user.id,
       permission_id: 8,
     });
+    
     Log.log(user.id, user.id, "user_create");
     return {success: 'Creation success'};
   }catch(error){

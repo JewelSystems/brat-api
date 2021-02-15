@@ -28,7 +28,7 @@ exports.login = async function(username, password) {
 };
 
 exports.checkToken = async function(token){
-  //Missing token]
+  //Missing token
   if(!token){
     return {"status": 403, "msg": "Missing token"};
   }

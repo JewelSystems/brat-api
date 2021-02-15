@@ -10,8 +10,6 @@ module.exports = {
     level: 'silly',
   },
   sequelize: {
-    host: 'mysql',
-    port: 33060,
     database: 'brat',
     username: 'root',
     password: 'root',

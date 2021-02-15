@@ -58,8 +58,8 @@ exports.delete = async function(id) {
 };
 
 exports.getGames = async function() {
-  logger.log("info", "Starting get all users function");
-  // Get user
+  logger.log("info", "Starting get all games function");
+  // Get games
   try{
     const games = await Game.findAll();
     resp = [];

@@ -1,7 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../loaders/sequelize');
 const Run = require('../models/Run');
-const RunIncentive = require('../models/RunIncentive');
 
 let EventRun = sequelize.define('EventRun', {
   id: {
