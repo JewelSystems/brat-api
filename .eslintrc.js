@@ -1,15 +1,21 @@
 module.exports = {
-  "env": {
-    "es6": true,
-    "browser": true,
-    "commonjs": true,
-    "es2020": true
-  },
-  "extends": "eslint:recommended",
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
   "rules": {
     "no-undef": 0,
     "no-constant-condition": 0,
     "indent": ["error", 2],
-    "semi": [2, "always"]
+    "semi": [2, "always"],
+    "prefer-const": 0,
+    "@typescript-eslint/no-explicit-any": 0,
+    "@typescript-eslint/explicit-module-boundary-types": 0
   }
 };
