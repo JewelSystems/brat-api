@@ -1,6 +1,9 @@
 import { getRepository } from 'typeorm';
+import submitRun from '../api/submitRun';
 import logger from '../loaders/logger';
 import BidwarOption from '../models/BidwarOption';
+import EventRun from '../models/EventRun';
+import EventRunIncentive from '../models/EventRunIncentive';
 import RunIncentive from '../models/RunIncentive';
 import RunRunner from '../models/RunRunner';
 import SubmitRun from '../models/SubmitRun';
@@ -11,6 +14,7 @@ export default{
     try{
 
       const submitRunsRepository = getRepository(SubmitRun);
+      const eventRunIncentivesRepository = getRepository(EventRunIncentive);
 
       const submitRuns = await submitRunsRepository
         .createQueryBuilder("submit_runs")
@@ -35,9 +39,6 @@ export default{
             "user.nickname as runner",
             "run_incentives",
             "bidwar_options"
-            //"incentives": [],
-            //"approved_incentives": {},
-            //"goals": {}
           ]
         )
         .getRawMany();
@@ -64,10 +65,10 @@ export default{
             "goals": {}
           });
         }
-        const arrIdx = resp.length-1;
+        const respIdx = resp.length-1;
         if(submitRun.run_incentives_id && submitRun.run_incentives_id != curIncentiveId){
           curIncentiveId = submitRun.run_incentives_id;
-          resp[arrIdx].incentives.push({
+          resp[respIdx].incentives.push({
             "id": submitRun.run_incentives_id,
             "run_id": submitRun.run_incentives_run_id,
             "type": submitRun.run_incentives_type,
@@ -75,32 +76,27 @@ export default{
             "name": submitRun.run_incentives_name,
             "BidwarOptions": []
           });
-          //TODO existance verification like commented below
-          resp[arrIdx].approved_incentives[submitRun.run_incentives_id] = 'true';
-          if(submitRun.run_incentives_type === 'none') resp[arrIdx].goals[submitRun.run_incentives_id] = 100;
+
+          if(submitRun.reviewed && resp[respIdx].incentives.length > 0){
+            const incentiveIdx = resp[respIdx].incentives.length-1;
+            const incentiveFound = await eventRunIncentivesRepository.findOne({ incentive_id: resp[respIdx].incentives[incentiveIdx].id });
+            if(incentiveFound){
+              resp[respIdx].approved_incentives[submitRun.run_incentives_id] = 'true';
+              if(incentiveFound.goal !== 0) resp[respIdx].goals[resp[respIdx].incentives[incentiveIdx].id] = incentiveFound.goal;
+            }else{
+              resp[respIdx].approved_incentives[submitRun.run_incentives_id] = 'false';
+            }
+          }
+
         }
         if(submitRun.bidwar_options_id){
-          let incentivesIdx = resp[arrIdx].incentives.length-1;
-          resp[arrIdx].incentives[incentivesIdx].BidwarOptions.push({
+          let incentivesIdx = resp[respIdx].incentives.length-1;
+          resp[respIdx].incentives[incentivesIdx].BidwarOptions.push({
             "id": submitRun.bidwar_options_id,
             "option": submitRun.bidwar_options_option,
             "incentive_id":submitRun.bidwar_options_incentive_id
           });
         }
-
-        /*
-        if(value.reviewed && resp[submitRun].incentives.length > 0){
-          for(incentive in resp[submitRun].incentives){
-            const incentiveFound = await EventRunIncentive.findOne({ where:{ incentive_id: resp[submitRun].incentives[incentive].id } });
-            if(incentiveFound) { 
-              resp[submitRun].approved_incentives[resp[submitRun].incentives[incentive].id] = true;
-              if(incentiveFound.dataValues.goal !== 0) resp[submitRun].goals[resp[submitRun].incentives[incentive].id] = incentiveFound.dataValues.goal;
-            }else{
-              resp[submitRun].approved_incentives[resp[submitRun].incentives[incentive].id] = false;
-            }
-          }
-        }
-        */
       }
   
       return {success: resp};
@@ -110,4 +106,118 @@ export default{
       return {error: "Server error"};
     }
   },
+
+  async update(id: string, reviewed: boolean, approved: boolean, waiting: boolean) {
+    logger.log("info", "Starting submit run update function");
+    // Update submit run
+    try{
+      const submitRunRepository = getRepository(SubmitRun);
+      const eventRunRepository = getRepository(EventRun);
+      
+      await submitRunRepository.update(id,{
+        reviewed: reviewed,
+        approved: approved,
+        waiting: waiting
+      });
+        
+      const resp: any = {
+        id: id,
+        reviewed: reviewed,
+        approved: approved,
+        waiting: waiting,
+      };
+
+      const submitRun = await submitRunRepository.findOne({ id: Number(id) });
+      //Create or remove evaluated submitted runs from event_runs table.
+      let newEvtRun = null;
+      let evtRun = null;
+
+      if(submitRun){
+        if(approved){
+          evtRun = await eventRunRepository.findOne({ run_id: submitRun.run_id });
+          
+          if(!evtRun){
+            if(waiting){
+              newEvtRun = eventRunRepository.create({event_id: submitRun.event_id, run_id: submitRun.run_id, date: '01-01-2021'});
+              await eventRunRepository.save(newEvtRun);
+            }else{
+              newEvtRun = eventRunRepository.create({event_id: submitRun.event_id, run_id: submitRun.run_id, date: '01-01-2021'});
+              await eventRunRepository.save(newEvtRun);
+            }
+          }
+        }else{
+          await eventRunRepository.delete(submitRun.run_id);
+        }
+      }
+
+      /*
+      if(newEvtRun) resp.event_run = newEvtRun.success.dataValues;
+      else resp.event_run = evtRun;
+      */
+
+      return {success: resp};
+    }catch(error){
+      console.log(error);
+      logger.log("error", "DB Error: " + JSON.stringify(error));
+      return {error: "Server error"};
+    }
+  },
+
+  async refuseSubmitRunNRemoveIncentives(id: string, reviewed: boolean, approved: boolean, waiting: boolean) {
+    logger.log("info", "Starting submit run with incentives refuse function");
+    // Remove submit run with incentives
+    try{
+      const submitRunRepository = getRepository(SubmitRun);
+      const eventRunRepository = getRepository(EventRun);
+      const eventRunIncentivesRepository = getRepository(EventRunIncentive);
+      //const EventRunBidwarOptionsRepository = getRepository();
+      
+      await submitRunRepository.update(id,{
+        reviewed: reviewed,
+        approved: approved,
+        waiting: waiting
+      });
+      
+      const submitRun = await submitRunRepository.findOne({ id: Number(id) });
+        
+      const resp: any = {
+        id: id,
+        reviewed: reviewed,
+        approved: approved,
+        waiting: waiting,
+      };
+
+      if(submitRun){
+        //TODO atualizar array de approve quando remover
+        const eventRun = await eventRunRepository.findOne({ run_id: submitRun.run_id });
+        if(eventRun){
+          const incentives = await eventRunIncentivesRepository.find({ where:{ event_run_id: eventRun.id } });
+          for(let incentive of incentives){
+            //const options = await EventRunBidwarOption.findAll({ where:{ event_run_incentive_id: incentives[incentive].id } });
+          }
+        }
+      }
+
+
+      /*
+      if(eventRun){
+        const incentives = await EventRunIncentive.findAll({ raw: true, where:{ event_run_id: eventRun.dataValues.id } });
+        for(incentive in incentives){
+          const options = await EventRunBidwarOption.findAll({ where:{ event_run_incentive_id: incentives[incentive].id } });
+          for(option in options){
+            await EventRunBidwarOption.destroy({ where:{ id:options[option].dataValues.id } });
+          }
+          await EventRunIncentive.destroy({ where:{ id:incentives[incentive].id } });
+        }
+        await eventRunController.delete(submitRun.dataValues.run_id);
+      }
+      */
+  
+      return {success: "resp"};
+    }catch(error){
+      console.log(error);
+      logger.log("error", "DB Error: " + JSON.stringify(error));
+      return {error: "Server error"};
+    }
+  }
 };

@@ -1,5 +1,6 @@
 import { getRepository } from 'typeorm';
 import logger from '../loaders/logger';
+import EventExtra from '../models/EventExtra';
 import EventSchedule from '../models/EventSchedule';
 import RunRunner from '../models/RunRunner';
 
@@ -18,13 +19,17 @@ export default{
         .leftJoinAndSelect("event_run.run_id", "run")
         .leftJoinAndSelect("run.game_id", "game")
         .leftJoinAndSelect(RunRunner, "run_runner", "run_runner.run_id = run.id")
+        .leftJoinAndSelect(EventExtra, "event_extra", "event_extra.id = event_schedule.event_extra_id")
         .leftJoinAndSelect("run_runner.runner_id", "user")
         .select([
           "event_schedule.id as id",
           "event_schedule.order as 'order'",
           "event_schedule.type as type",
           "event_schedule.event_id as event_id",
+          "event_schedule.event_run_id as event_run_id",
+          "event_schedule.event_extra_id as event_extra_id",
           "event_schedule.extra_time as extra_time",
+          "event_schedule.setup_time as setup_time",
           "event_schedule.active as active",
           "event_schedule.done as done",
           "event_schedule.final_time as final_time",
@@ -37,71 +42,24 @@ export default{
           "run.platform as platform",
           "user.nickname as runner",
           "user.stream_link as stream_link",
+          "event_extra.time as event_extra_time",
+          "event_extra.type as event_extra_type"
         ])
         .getRawMany();
 
-      console.log(eventSchedule);
-
-      /*
-      resp = [];
-      for(task in schedule){
-        const values = schedule[task].dataValues;
-        let duration, game, category, interval, platform, runner, streamLink;
-        if(values.setup_time) {
-          game = 'Setup';
-          duration = values.setup_time;
-          category = null;
-          interval = null;
-          platform = null;
-          runner = null;
-          streamLink = null;
+      for(let task of eventSchedule){
+        if(task.setup_time){
+          task.game = 'Setup';
+          task.duration = task.setup_time;
         }
-        else if(values.EventRun) {
-          game = values.EventRun.Run.Game.name;
-          duration = values.EventRun.Run.estimated_time;
-          category = values.EventRun.Run.category;
-          interval = values.EventRun.Run.preferred_time_slot;
-          platform = values.EventRun.Run.platform;
-          runner = values.EventRun.Run.RunRunners[0].User.nickname;
-          streamLink = values.EventRun.Run.RunRunners[0].User.stream_link;
+        if(task.event_extra_id){
+          task.game = task.event_extra_type;
+          task.duration = task.event_extra_time;
+          task.category = task.event_extra_type;
+          task.platform = "Todas";
+          task.runner = "Todos";
         }
-        else if(values.EventExtra){
-          game = values.EventExtra.type;
-          duration = values.EventExtra.time;
-          category = values.EventExtra.type;
-          interval = null;
-          platform = 'Todas';
-          runner = 'Todos';
-          streamLink = null;
-        }
-  
-  
-        resp.push({
-          "id": values.id,
-          "order": values.order,
-          "type": values.type,
-          "event_id": values.event_id,
-          "extra_time": values.extra_time,
-          "active": values.active,
-          "done": values.done,
-          "final_time": values.final_time,
-  
-          "event_name": values.Event.name,
-          "event_date": values.Event.start,
-          
-          "game": game,
-          "duration": duration,
-          "category": category,
-          "interval": interval,
-          "platform": platform,
-          "runner": runner,
-          "stream_link": streamLink,
-        });
       }
-      //console.log(resp);
-      //console.log('aqui', JSON.stringify(schedule, null, 2));
-      */
-
       return {success: eventSchedule};
     }catch(error){
       console.log(error);
@@ -110,5 +68,71 @@ export default{
     }
   },
 
+  async updateEventSchedule(data: any) {
+    logger.log("info", "Starting update event schedule order function");
+    try{
+      const dataJSON = JSON.parse(data);
 
+      const eventScheduleRepository = getRepository(EventSchedule);
+
+      for(let row of dataJSON){
+        await eventScheduleRepository.update(Number(row.id), { "order": row.order});
+      }
+
+      const resp = await this.getEventSchedule();
+      return {success: resp};
+    }catch(error){
+      console.log(error);
+      logger.log("error", "DB Error: " + JSON.stringify(error));
+      return {error: "Server error"};
+    }
+  },
+
+  async createSetupEventSchedule(data: any, setups: any) {
+    logger.log("info", "Starting create setup on event schedule function");
+    // Get event schedule
+    try{
+      const dataJSON = JSON.parse(data);
+
+      const eventScheduleRepository = getRepository(EventSchedule);
+      for(let setup of setups){
+        const newSetup: EventSchedule = eventScheduleRepository.create({
+          "order": setup.order,
+          "type": setup.type,
+          "event_id": setup.event_id,
+          "setup_time": setup.duration,
+          "active": false,
+          "done": false,
+        });
+        await eventScheduleRepository.save(newSetup);
+        
+        dataJSON.find((element: any) => element.order === newSetup.order).id = newSetup.id;
+      }
+
+      await this.updateEventSchedule(JSON.stringify(dataJSON));
+
+      const resp = await this.getEventSchedule();
+      return {success: resp};
+    }catch(error){
+      console.log(error);
+      logger.log("error", "DB Error: " + JSON.stringify(error));
+      return {error: "Server error"};
+    }
+  },
+
+  async deleteEventSchedule(id: string) {
+    logger.log("info", "Starting delete event schedule function");
+    // delete event schedule
+    try{
+      const eventScheduleRepository = getRepository(EventSchedule);
+      await eventScheduleRepository.delete(id);
+
+      const resp = await this.getEventSchedule();
+      return {success: resp};
+    }catch(error){
+      console.log(error);
+      logger.log("error", "DB Error: " + JSON.stringify(error));
+      return {error: "Server error"};
+    }
+  }
 };

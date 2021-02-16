@@ -181,17 +181,15 @@ let loggedFunctionsAdmin = {
 
   */
   getEventSchedule: eventSchedule.getEventSchedule,
-  /*
   updateEventSchedule: eventSchedule.updateEventSchedule,
-  deleteEventSchedule: eventSchedule.deleteEventSchedule,
   createSetupEventSchedule: eventSchedule.createSetupEventSchedule,
+  deleteEventSchedule: eventSchedule.deleteEventSchedule,
 
-  */
   getSubmitRuns: submitRun.getSubmitRuns,
-  /*
   updateSubmitRun: submitRun.updateSubmitRun,
-  updateSubmitRunNRunIncentives: submitRun.updateSubmitRunNRunIncentives,
   refuseSubmitRunNRemoveIncentives: submitRun.refuseSubmitRunNRemoveIncentives,
+  /*
+  updateSubmitRunNRunIncentives: submitRun.updateSubmitRunNRunIncentives,
 
   updateIncentive: runIncentive.update,
   getRunIncentives: runIncentive.getRunIncentives,

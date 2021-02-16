@@ -15,5 +15,5 @@ export default class EventRun {
 	run_id: number;
 
 	@Column({ nullable: false })
-	date: string;
+	date: Date;
 }
