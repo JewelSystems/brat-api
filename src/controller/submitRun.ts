@@ -1,9 +1,9 @@
 import { getRepository } from 'typeorm';
-import submitRun from '../api/submitRun';
 import logger from '../loaders/logger';
 import BidwarOption from '../models/BidwarOption';
 import EventRun from '../models/EventRun';
 import EventRunIncentive from '../models/EventRunIncentive';
+import EventRunBidwarOption from '../models/EventRunBidwarOption';
 import RunIncentive from '../models/RunIncentive';
 import RunRunner from '../models/RunRunner';
 import SubmitRun from '../models/SubmitRun';
@@ -101,7 +101,6 @@ export default{
   
       return {success: resp};
     }catch(error){
-      console.log(error);
       logger.log("error", "DB Error: " + JSON.stringify(error));
       return {error: "Server error"};
     }
@@ -150,14 +149,11 @@ export default{
         }
       }
 
-      /*
-      if(newEvtRun) resp.event_run = newEvtRun.success.dataValues;
+      if(newEvtRun) resp.event_run = newEvtRun;
       else resp.event_run = evtRun;
-      */
 
       return {success: resp};
     }catch(error){
-      console.log(error);
       logger.log("error", "DB Error: " + JSON.stringify(error));
       return {error: "Server error"};
     }
@@ -170,7 +166,7 @@ export default{
       const submitRunRepository = getRepository(SubmitRun);
       const eventRunRepository = getRepository(EventRun);
       const eventRunIncentivesRepository = getRepository(EventRunIncentive);
-      //const EventRunBidwarOptionsRepository = getRepository();
+      const EventRunBidwarOptionsRepository = getRepository(EventRunBidwarOption);
       
       await submitRunRepository.update(id,{
         reviewed: reviewed,
@@ -193,29 +189,93 @@ export default{
         if(eventRun){
           const incentives = await eventRunIncentivesRepository.find({ where:{ event_run_id: eventRun.id } });
           for(let incentive of incentives){
-            //const options = await EventRunBidwarOption.findAll({ where:{ event_run_incentive_id: incentives[incentive].id } });
+            const options = await EventRunBidwarOptionsRepository.find({ where:{ event_run_incentive_id: incentive.id } });
+            for(let option of options){
+              EventRunBidwarOptionsRepository.delete(option.id);
+            }
+            eventRunIncentivesRepository.delete(incentive.id);
           }
+          eventRunRepository.delete(eventRun.id);
         }
       }
-
-
-      /*
-      if(eventRun){
-        const incentives = await EventRunIncentive.findAll({ raw: true, where:{ event_run_id: eventRun.dataValues.id } });
-        for(incentive in incentives){
-          const options = await EventRunBidwarOption.findAll({ where:{ event_run_incentive_id: incentives[incentive].id } });
-          for(option in options){
-            await EventRunBidwarOption.destroy({ where:{ id:options[option].dataValues.id } });
-          }
-          await EventRunIncentive.destroy({ where:{ id:incentives[incentive].id } });
-        }
-        await eventRunController.delete(submitRun.dataValues.run_id);
-      }
-      */
   
-      return {success: "resp"};
+      return {success: resp};
     }catch(error){
-      console.log(error);
+      logger.log("error", "DB Error: " + JSON.stringify(error));
+      return {error: "Server error"};
+    }
+  },
+
+  async updateSubmitRunNRunIncentives(id: string, reviewed: boolean, approved: boolean, waiting: boolean, incentives: any) {
+    logger.log("info", "Starting submit run with incentives update function");
+    // Update submit run
+    try{
+      const runIncentivesRepository = getRepository(RunIncentive);
+      const eventRunIncentivesRepository = getRepository(EventRunIncentive);
+      const eventRunBidwarOptionRepository = getRepository(EventRunBidwarOption);
+
+      let eventRunId = await this.update(id, reviewed, approved, waiting);
+      const eventRunInfo = eventRunId.success;
+      let approvedIncentives: any = {};
+      let goals: any = {};
+
+      const allIncentives = await runIncentivesRepository.find({ where:{run_id: eventRunInfo.event_run.run_id} });
+
+      for(let incentive of allIncentives){
+        const curIncentive = await incentives.filter((element: any) => element.id === incentive.id);
+        const eventRunIncentiveFound = await eventRunIncentivesRepository.findOne({ where:{incentive_id: incentive.id} });
+        
+        if(curIncentive.length > 0){
+          if(eventRunIncentiveFound){
+            //If the event run incentive was found, update it's values.
+            await eventRunIncentivesRepository.update(curIncentive[0].id, {
+              "event_run_id": eventRunInfo.event_run.id,
+              "incentive_id": curIncentive[0].id,
+              "goal": Number(curIncentive[0].goal)
+            });
+          }else{
+            //If the event run incentive wasn't found, create.
+            const eventRunIncentive = eventRunIncentivesRepository.create({
+              "event_run_id": eventRunInfo.event_run.id,
+              "incentive_id": curIncentive[0].id,
+              "cur_value": 0,
+              "goal": Number(curIncentive[0].goal),
+            });
+            await eventRunIncentivesRepository.save(eventRunIncentive);
+
+            if(curIncentive[0].options && curIncentive[0].options.length > 0){
+              for(let option of curIncentive[0].options){
+                const eventRunBidwarOption = eventRunBidwarOptionRepository.create({
+                  "event_run_incentive_id": eventRunIncentive.id,
+                  "bidwar_option_id": option.id,
+                  "cur_value": 0
+                });
+                await eventRunBidwarOptionRepository.save(eventRunBidwarOption);
+              }
+            }
+          }
+          approvedIncentives[incentive.id] = true;
+          if(curIncentive[0].goal !== 0) goals[incentive.id] = curIncentive[0].goal;
+        }else{
+          if(eventRunIncentiveFound){
+            await eventRunBidwarOptionRepository.delete({ event_run_incentive_id: eventRunIncentiveFound.id });
+            await eventRunIncentivesRepository.delete({ incentive_id: incentive.id });
+          }
+          approvedIncentives[incentive.id] = false;
+        }
+      }
+
+      const resp = {
+        id: id,
+        reviewed: reviewed,
+        approved: approved,
+        waiting: waiting,
+        approved_incentives: approvedIncentives,
+        goals: goals
+      };
+
+      return {success: resp};
+    }catch(error){
       logger.log("error", "DB Error: " + JSON.stringify(error));
       return {error: "Server error"};
     }

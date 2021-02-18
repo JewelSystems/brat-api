@@ -27,5 +27,14 @@ export default{
     }
     //Successful request
     return {"status": 200, "msg": "updateSubmitRunNRemoveIncentives", data:[response.success], "type": "adminBroadcast"};
+  },
+
+  async updateSubmitRunNRunIncentives(id: string, reviewed: boolean, approved: boolean, waiting: boolean, incentives: any) {
+    let response = await Controller.updateSubmitRunNRunIncentives(id, reviewed, approved, waiting, incentives);
+    if (response.error) {
+      return {"status": 403, "msg": response.error};
+    }
+    //Successful request
+    return {"status": 200, "msg": "updateSubmitRunsNRunIncentives", data:[response.success], "type": "adminBroadcast"};
   }
 };

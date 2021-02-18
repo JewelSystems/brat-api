@@ -10,6 +10,7 @@ import event from './event';
 import userPermission from './userPermission';
 import submitRun from './submitRun';
 import eventSchedule from './eventSchedule';
+import runIncentive from './runIncentive';
 
 /*
 interface IConnection{
@@ -129,14 +130,13 @@ const websocket = (server: Server) => {
 
 // Logged functions Admin
 let loggedFunctionsAdmin = {
-  /*
-  getUser: user.get,
-  */
+  //getUser: user.get,
   getUsers: user.getUsers,
   getUserRuns: user.getUserRuns,
   
   removePermission: userPermission.removePermission,
   addPermission: userPermission.addPermission,
+
   /*
   createGame: game.create,
   getGame: game.get,
@@ -172,8 +172,8 @@ let loggedFunctionsAdmin = {
   deleteEventExtra: eventExtra.delete,
   */
   getEventExtras: eventExtra.getExtras,
-  /*
 
+  /*
   createEventRun: eventRun.create,
   getEventRun: eventRun.get,
   updateEventRun: eventRun.update,
@@ -188,20 +188,16 @@ let loggedFunctionsAdmin = {
   getSubmitRuns: submitRun.getSubmitRuns,
   updateSubmitRun: submitRun.updateSubmitRun,
   refuseSubmitRunNRemoveIncentives: submitRun.refuseSubmitRunNRemoveIncentives,
-  /*
   updateSubmitRunNRunIncentives: submitRun.updateSubmitRunNRunIncentives,
 
   updateIncentive: runIncentive.update,
   getRunIncentives: runIncentive.getRunIncentives,
-  */
 };
 
 // Logged User functions
 let loggedFunctionsBase = {
-  /*
-  getUser: user.get,
-  getUsers: user.getUsers,
-  */
+  //getUser: user.get,
+  //getUsers: user.getUsers,
   getUserRuns: user.getUserRuns,
   
   /*

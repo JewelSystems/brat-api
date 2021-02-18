@@ -1,28 +1,12 @@
 export default {
   redis: {
-    host: "127.0.0.1",
-    port: 6379,
+    host: process.env.REDIS_HOST || "127.0.0.1",
+    port: Number(process.env.REDIS_PORT) || 6379,
     password: '',
     db: 0,
-    name: 'BrAT-ioredis'
+    name: process.env.REDIS_NAME || 'BrAT-ioredis'
   },
   logs: {
     level: 'silly',
   },
-  sequelize: {
-    database: 'brat',
-    username: 'root',
-    password: 'root',
-    options: {
-      dialect: 'mysql',
-      raw: true,
-      define: {
-        syncOnAssociation: false
-      },
-      sync: {
-        force: false,
-        alter: false
-      }
-    }
-  }
 };
