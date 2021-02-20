@@ -1,7 +1,13 @@
 import Controller from '../controller/eventExtra';
 
+interface APIResponse{
+  status: number;
+  msg: string;
+  data?: any;
+}
+
 export default {
-  async getExtras(){
+  async getExtras(): Promise<APIResponse>{
     let response = await Controller.getExtras();
     if (response.error) {
       return {"status": 403, "msg": response.error};

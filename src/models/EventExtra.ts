@@ -1,10 +1,13 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import Event from '../models/Event';
 
 @Entity('event_extras')
 export default class EventExtra {
 	@PrimaryGeneratedColumn('increment')
 	id: number;
 
+	@ManyToOne(() => Event)
+	@JoinColumn({ name: "event_id" })
 	@Column({ type: 'bigint', nullable: false })
 	event_id: number;
 

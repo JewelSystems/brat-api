@@ -3,7 +3,7 @@ import { getRepository } from 'typeorm';
 import UserLog from '../models/UserLog';
 
 export default {
-  async log(updatedId: number, updaterId: number, type: string){
+  async log(updatedId: number, updaterId: number, type: string): Promise<void>{
     try{
       const userLogRepository = getRepository(UserLog);
 

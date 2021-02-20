@@ -4,8 +4,23 @@ import EventExtra from '../models/EventExtra';
 import EventSchedule from '../models/EventSchedule';
 import RunRunner from '../models/RunRunner';
 
+interface CtrlResponse{
+  success?: any;
+  error?: string;
+}
+
+interface ISetup{
+  type: string,
+  event_id: string,
+  event_name: string,
+  event_date: string,
+  game: string,
+  duration: number,
+  order: number
+}
+
 export default{
-  async getEventSchedule() {
+  async getEventSchedule(): Promise<CtrlResponse> {
     logger.log("info", "Starting get event schedule function");
     // Get event schedule
     try{
@@ -68,7 +83,7 @@ export default{
     }
   },
 
-  async updateEventSchedule(data: any) {
+  async updateEventSchedule(data: string): Promise<CtrlResponse> {
     logger.log("info", "Starting update event schedule order function");
     try{
       const dataJSON = JSON.parse(data);
@@ -88,7 +103,7 @@ export default{
     }
   },
 
-  async createSetupEventSchedule(data: any, setups: any) {
+  async createSetupEventSchedule(data: string, setups: ISetup[]): Promise<CtrlResponse> {
     logger.log("info", "Starting create setup on event schedule function");
     // Get event schedule
     try{
@@ -96,17 +111,17 @@ export default{
 
       const eventScheduleRepository = getRepository(EventSchedule);
       for(let setup of setups){
-        const newSetup: EventSchedule = eventScheduleRepository.create({
+        const newSetup = eventScheduleRepository.create({
           "order": setup.order,
           "type": setup.type,
-          "event_id": setup.event_id,
+          "event_id": Number(setup.event_id),
           "setup_time": setup.duration,
           "active": false,
           "done": false,
         });
         await eventScheduleRepository.save(newSetup);
         
-        dataJSON.find((element: any) => element.order === newSetup.order).id = newSetup.id;
+        dataJSON.find((element: ISetup) => element.order === newSetup.order).id = newSetup.id;
       }
 
       await this.updateEventSchedule(JSON.stringify(dataJSON));
@@ -120,7 +135,7 @@ export default{
     }
   },
 
-  async deleteEventSchedule(id: string) {
+  async deleteEventSchedule(id: string): Promise<CtrlResponse> {
     logger.log("info", "Starting delete event schedule function");
     // delete event schedule
     try{

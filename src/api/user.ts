@@ -1,6 +1,21 @@
 import userSchema from '../schemas/UserSchema';
 import Controller from '../controller/user';
 
+interface APIResponse{
+  status: number;
+  msg: string;
+  data?: any;
+}
+
+interface IResponse {
+  status: number;
+  body: {
+    success?: string;
+    error?: string;
+    res?: any;
+  }
+}
+
 export default {
   async create(
     firstName: string, 
@@ -17,7 +32,7 @@ export default {
     twitter: string, 
     facebook: string, 
     instagram: string, 
-    youtube: string) {
+    youtube: string): Promise<IResponse>{
     //Schema Validation
     try{
       await userSchema.signup.validateAsync({
@@ -93,7 +108,7 @@ export default {
     };
   },
 
-  async get(id: string){
+  async get(id: string): Promise<IResponse>{
     //Missing id
     if (!id) {
       return {
@@ -131,7 +146,7 @@ export default {
     };
   },
 
-  async getUserRuns(id: string){
+  async getUserRuns(id: string): Promise<APIResponse>{
     let response = await Controller.getUserRuns(id);
     if (response.error) {
       return {"status": 403, "msg": response.error};
@@ -140,7 +155,7 @@ export default {
     return {"status": 200, "msg": "listUserRuns", data:[response.success]};
   },
 
-  async getUsers() {
+  async getUsers(): Promise<APIResponse>{
     let response = await Controller.getUsers();
     if (response.error) {
       return {"status": 403, "msg": response.error};

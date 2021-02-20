@@ -1,19 +1,29 @@
 import logger from '../loaders/logger';
-import { getManager, getRepository } from 'typeorm';
+import { getRepository } from 'typeorm';
 import EventExtra from '../models/EventExtra';
 
+interface CtrlResponse{
+  success?: any;
+  error?: string;
+}
+
 export default{
-  async getExtras(){
+  async getExtras(): Promise<CtrlResponse>{
     logger.log("info", "Starting get all event extras function");
     try{
-      /*
-      const eventExtrasRepository = getRepository(EventExtra);
+      const eventExtraRepo = getRepository(EventExtra);
+      
+      const eventExtras = await eventExtraRepo
+        .createQueryBuilder("event_extra")
+        .leftJoinAndSelect("event_extra.event_id", "event")
+        .select([
+          "event_extra.id as id",
+          "event.name as name",
+          "event_extra.type as type",
+          "event_extra.time as time"
+        ])
+        .getRawMany();
 
-      const eventExtras = await eventExtrasRepository.find();
-      */
-      const entityManager = getManager();
-      const sqlQuery = 'SELECT event_extras.id, events.name, event_extras.type, event_extras.time FROM event_extras, events where event_extras.event_id = events.id';
-      const eventExtras = await entityManager.query(sqlQuery);
       return { success: eventExtras };
     }catch(error){
       logger.log("error", "DB Error: " + JSON.stringify(error));

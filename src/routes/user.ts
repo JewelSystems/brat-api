@@ -2,10 +2,11 @@ import { Application, Request, Response } from 'express';
 import API from '../api/user';
 
 interface IResponse {
-  status: number,
+  status: number;
   body: {
-    success?: string,
-    error?: string
+    success?: string;
+    error?: string;
+    res?: any;
   }
 }
 
@@ -33,7 +34,7 @@ let user = (app: Application) => {
   });
 
   app.get('/user/:id', async (req, res) => {  
-    let response = await API.get(req.params.id);
+    let response: IResponse = await API.get(req.params.id);
     res.status(response.status).send(response.body);
   });
 

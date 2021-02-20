@@ -3,8 +3,13 @@ import logger from '../loaders/logger';
 import userLog from '../controller/userLog';
 import { getManager } from 'typeorm';
 
+interface CtrlResponse{
+  success?: any;
+  error?: string;
+}
+
 export default{
-  async removePermission(updatedUser: string, updaterUser: string, permission: string) {
+  async removePermission(updatedUser: string, updaterUser: string, permission: string): Promise<CtrlResponse> {
     logger.log("info", "Starting remove permission function");
     // remove permission from user
     try{
@@ -21,7 +26,7 @@ export default{
     }
   },
 
-  async addPermission(updatedUser: string, updaterUser: string, permission: string) {
+  async addPermission(updatedUser: string, updaterUser: string, permission: string): Promise<CtrlResponse> {
     logger.log("info", "Starting add permission function");
     // remove permission from user
     try{

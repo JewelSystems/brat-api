@@ -4,8 +4,21 @@ import userController from '../controller/user';
 import redis from '../loaders/redis';
 import { getManager } from 'typeorm';
 
+interface CtrlResponse{
+  success?: any;
+  error?: string;
+  user?: string;
+  permissions?: any;
+}
+
+interface ILoginResp{
+  error?: string;
+  id?: number;
+  token?: string;
+}
+
 export default{
-  async login(username: string, password: string){
+  async login(username: string, password: string): Promise<ILoginResp>{
     logger.log("info", "Starting login function");
     // Verify if username exists
     const userFound = await userController.checkUsername(username);
@@ -32,7 +45,7 @@ export default{
     };
   },
 
-  async redisAuthCheck(token: number){
+  async redisAuthCheck(token: string): Promise<CtrlResponse>{
     logger.log("info", "Starting redis authentication check function");
     const user = await redis.get(`user-${token}`);
 

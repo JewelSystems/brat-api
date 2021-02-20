@@ -1,7 +1,7 @@
 import API from '../api/user';
 
 export default{
-  async getUserRuns(packet: any) {
+  async getUserRuns(packet: {id: string}) {
     return await API.getUserRuns(packet.id);
   },
 

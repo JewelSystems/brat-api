@@ -1,10 +1,15 @@
 import crypto from 'crypto';
 import logger from '../loaders/logger';
-
 import User from '../models/User';
 import UserPermission from '../models/UserPemission';
 import userLog from '../controller/userLog';
 import { getManager, getRepository } from 'typeorm';
+
+
+interface CtrlResponse{
+  success?: any;
+  error?: string;
+}
 
 export default {
   async checkUsername(username: string): Promise<User | undefined | never>{
@@ -52,7 +57,7 @@ export default {
     twitter: string, 
     facebook: string, 
     instagram: string, 
-    youtube: string){
+    youtube: string): Promise<CtrlResponse>{
     logger.log("info", "Starting user create function");
     try{
       //Create User
@@ -102,7 +107,7 @@ export default {
     }
   },
 
-  async get(id: string){
+  async get(id: string): Promise<CtrlResponse>{
     logger.log("info", "Starting user get function");
     try{
       const entityManager = getManager();
@@ -115,7 +120,7 @@ export default {
     }
   },
 
-  async getUserRuns(id: string){
+  async getUserRuns(id: string): Promise<CtrlResponse>{
     logger.log("info", "Starting get user runs function");
     try{
       const entityManager = getManager();
@@ -130,7 +135,7 @@ export default {
     }
   },
 
-  async login(username: string, password: string){
+  async login(username: string, password: string): Promise<boolean> {
     const userRepository = getRepository(User);
 
     const userFound= await userRepository.findOne({
@@ -148,7 +153,7 @@ export default {
     return false;
   },
 
-  async getUsers() {
+  async getUsers(): Promise<CtrlResponse>{
     logger.log("info", "Starting get all users function");
     // Get users
     try{

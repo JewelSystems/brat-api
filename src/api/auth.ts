@@ -1,7 +1,25 @@
 import Controller from '../controller/auth';
 
+interface IResponse {
+  status: number;
+  body: {
+    success?: string;
+    error?: string;
+    id?: number;
+    token?: string;
+  }
+}
+
+interface APIResponse{
+  status: number;
+  msg: string;
+  data?: any;
+  user?: string;
+  permissions?: any;
+}
+
 export  default{
-  async login(username: string, password: string){
+  async login(username: string, password: string): Promise<IResponse>{
     if (!username || !password) {
       return {
         status: 403,
@@ -30,7 +48,7 @@ export  default{
     };
   },
 
-  async checkToken(token: number){
+  async checkToken(token: string): Promise<APIResponse>{
     //Missing token
     if(!token){
       return {"status": 403, "msg": "Missing token"};

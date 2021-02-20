@@ -2,8 +2,13 @@ import logger from '../loaders/logger';
 import { getRepository } from 'typeorm';
 import Game from '../models/Game';
 
+interface CtrlResponse{
+  success?: any;
+  error?: string;
+}
+
 export default{
-  async getGames(){
+  async getGames(): Promise<CtrlResponse>{
     logger.log("info", "Starting get all games function");
     try{
       const gamesRepository = getRepository(Game);
@@ -16,7 +21,7 @@ export default{
     }
   },
 
-  async update(id: string, name: string, year: string){
+  async update(id: string, name: string, year: string): Promise<CtrlResponse>{
     logger.log("info", "Starting game update function");
     // Update game
     try{

@@ -3,8 +3,13 @@ import moment from 'moment';
 import { getRepository } from 'typeorm';
 import Event from '../models/Event';
 
+interface CtrlResponse{
+  success?: any;
+  error?: string;
+}
+
 export default{
-  async getEvents(){
+  async getEvents(): Promise<CtrlResponse>{
     logger.log("info", "Starting get all events function");
     try{
       
@@ -24,7 +29,7 @@ export default{
     }
   },
 
-  async updateEventState(id: string) {
+  async updateEventState(id: string): Promise<CtrlResponse> {
     logger.log("info", "Starting event state update function");
     // Update event state
     try{
@@ -53,7 +58,7 @@ export default{
     }
   },
 
-  async update(id: string, name: string, donationLink: string, start: string, end: string) {
+  async update(id: string, name: string, donationLink: string, start: string, end: string): Promise<CtrlResponse> {
     logger.log("info", "Starting event update function");
     try{
       const eventRepository = getRepository(Event);
@@ -78,7 +83,7 @@ export default{
     }
   },
 
-  async create(name: string, donationLink: string, start: string, end: string) {
+  async create(name: string, donationLink: string, start: string, end: string): Promise<CtrlResponse> {
     logger.log("info", "Starting event create function");
     try{
       const eventRepository = getRepository(Event);

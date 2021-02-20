@@ -7,8 +7,24 @@ import RunIncentive from '../models/RunIncentive';
 import BidwarOption from '../models/BidwarOption';
 import Game from '../models/Game';
 
+interface CtrlResponse{
+  success?: any;
+  error?: string;
+}
+
+interface IIncentive{
+  type: string;
+  comment: string;
+  name: string;
+  options: IOption[];
+}
+
+interface IOption{
+  name: string
+}
+
 export default{
-  async create(runnerId: string, gameId: string, category: string, estimatedTime: number, preferredTime: string, platform: string, incentives: any){
+  async create(runnerId: string, gameId: string, category: string, estimatedTime: number, preferredTime: string, platform: string, incentives: IIncentive[]): Promise<CtrlResponse>{
     logger.log("info", "Starting create run function");
     try{
       //Create Run
@@ -88,7 +104,7 @@ export default{
     }
   },
 
-  async createRunNGame(runnerId: string, category: string, estimatedTime: number, preferredTime: string, platform: string, name: string, year: string, incentives: any){
+  async createRunNGame(runnerId: string, category: string, estimatedTime: number, preferredTime: string, platform: string, name: string, year: string, incentives: IIncentive[]): Promise<CtrlResponse>{
     logger.log("info", "Starting create run and game function");
     try{
       const gameRepository = getRepository(Game);

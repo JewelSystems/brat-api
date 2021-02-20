@@ -4,8 +4,21 @@ import { getRepository } from 'typeorm';
 import BidwarOption from '../models/BidwarOption';
 import EventSchedule from '../models/EventSchedule';
 
+interface CtrlResponse{
+  success?: any;
+  error?: string;
+}
+
+interface IIncentive{
+  id: string;
+  name: string;
+  comment: string;
+  bidwar_options: {id: string; option: string; incentive_id: string}[];
+  goal?: number;
+}
+
 export default{
-  async update(incentive: any) {
+  async update(incentive: IIncentive): Promise<CtrlResponse> {
     logger.log("info", "Starting incentive update function");
     // Update incentive
     try{
@@ -32,7 +45,7 @@ export default{
     }
   },
 
-  async getRunIncentives(scheduleId: string) {
+  async getRunIncentives(scheduleId: string): Promise<CtrlResponse> {
     logger.log("info", "Starting incentive run get function");
     // get run incentives
     try{

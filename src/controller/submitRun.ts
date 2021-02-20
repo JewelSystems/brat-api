@@ -8,8 +8,63 @@ import RunIncentive from '../models/RunIncentive';
 import RunRunner from '../models/RunRunner';
 import SubmitRun from '../models/SubmitRun';
 
+interface CtrlResponse{
+  success?: any;
+  error?: string;
+}
+
+interface ISubmitRun{
+  id: string;
+  reviewed: boolean;
+  approved: boolean;
+  waiting: boolean;
+  event_run?: EventRun | null;
+}
+
+interface IIncentive{
+  id: string;
+  run_id: string;
+  type: string;
+  comment: string;
+  name: string;
+  options: IOption[];
+  goal?: number;
+}
+
+interface IOption{
+  id: string;
+  name: string;
+}
+
+interface IGetSubmitRun{
+  id: string;
+  event_name: string;
+  game_name: string;
+  category: string;
+  platform: string;
+  time_slot: string;
+  reviewed: boolean;
+  approved: boolean;
+  waiting: boolean;
+  runner: string;
+  incentives: {
+    id: string;
+    run_id: string;
+    type: string;
+    comment: string;
+    name: string;
+    BidwarOptions: {
+      id: string;
+      option: string;
+      incentive_id: string
+    }[];
+  }[];
+  approved_incentives: any;//{},
+  goals: any;//{}
+}
+
 export default{
-  async getSubmitRuns() {
+  async getSubmitRuns(): Promise<CtrlResponse> {
     logger.log("info", "Starting get submit runs function");
     try{
 
@@ -43,7 +98,7 @@ export default{
         )
         .getRawMany();
 
-      let resp: any[] = [];
+      let resp: IGetSubmitRun[] = [];
       let curId = '';
       let curIncentiveId = '';
       for(let submitRun of submitRuns){
@@ -79,7 +134,7 @@ export default{
 
           if(submitRun.reviewed && resp[respIdx].incentives.length > 0){
             const incentiveIdx = resp[respIdx].incentives.length-1;
-            const incentiveFound = await eventRunIncentivesRepository.findOne({ incentive_id: resp[respIdx].incentives[incentiveIdx].id });
+            const incentiveFound = await eventRunIncentivesRepository.findOne({ incentive_id: Number(resp[respIdx].incentives[incentiveIdx].id) });
             if(incentiveFound){
               resp[respIdx].approved_incentives[submitRun.run_incentives_id] = 'true';
               if(incentiveFound.goal !== 0) resp[respIdx].goals[resp[respIdx].incentives[incentiveIdx].id] = incentiveFound.goal;
@@ -106,7 +161,7 @@ export default{
     }
   },
 
-  async update(id: string, reviewed: boolean, approved: boolean, waiting: boolean) {
+  async update(id: string, reviewed: boolean, approved: boolean, waiting: boolean): Promise<CtrlResponse> {
     logger.log("info", "Starting submit run update function");
     // Update submit run
     try{
@@ -119,7 +174,7 @@ export default{
         waiting: waiting
       });
         
-      const resp: any = {
+      const resp: ISubmitRun = {
         id: id,
         reviewed: reviewed,
         approved: approved,
@@ -159,7 +214,7 @@ export default{
     }
   },
 
-  async refuseSubmitRunNRemoveIncentives(id: string, reviewed: boolean, approved: boolean, waiting: boolean) {
+  async refuseSubmitRunNRemoveIncentives(id: string, reviewed: boolean, approved: boolean, waiting: boolean): Promise<CtrlResponse> {
     logger.log("info", "Starting submit run with incentives refuse function");
     // Remove submit run with incentives
     try{
@@ -176,7 +231,7 @@ export default{
       
       const submitRun = await submitRunRepository.findOne({ id: Number(id) });
         
-      const resp: any = {
+      const resp = {
         id: id,
         reviewed: reviewed,
         approved: approved,
@@ -206,7 +261,7 @@ export default{
     }
   },
 
-  async updateSubmitRunNRunIncentives(id: string, reviewed: boolean, approved: boolean, waiting: boolean, incentives: any) {
+  async updateSubmitRunNRunIncentives(id: string, reviewed: boolean, approved: boolean, waiting: boolean, incentives: IIncentive[]): Promise<CtrlResponse> {
     logger.log("info", "Starting submit run with incentives update function");
     // Update submit run
     try{
@@ -222,7 +277,7 @@ export default{
       const allIncentives = await runIncentivesRepository.find({ where:{run_id: eventRunInfo.event_run.run_id} });
 
       for(let incentive of allIncentives){
-        const curIncentive = await incentives.filter((element: any) => element.id === incentive.id);
+        const curIncentive = incentives.filter((element: IIncentive) => Number(element.id) === Number(incentive.id));
         const eventRunIncentiveFound = await eventRunIncentivesRepository.findOne({ where:{incentive_id: incentive.id} });
         
         if(curIncentive.length > 0){
@@ -230,14 +285,14 @@ export default{
             //If the event run incentive was found, update it's values.
             await eventRunIncentivesRepository.update(curIncentive[0].id, {
               "event_run_id": eventRunInfo.event_run.id,
-              "incentive_id": curIncentive[0].id,
+              "incentive_id": Number(curIncentive[0].id),
               "goal": Number(curIncentive[0].goal)
             });
           }else{
             //If the event run incentive wasn't found, create.
             const eventRunIncentive = eventRunIncentivesRepository.create({
-              "event_run_id": eventRunInfo.event_run.id,
-              "incentive_id": curIncentive[0].id,
+              "event_run_id": Number(eventRunInfo.event_run.id),
+              "incentive_id": Number(curIncentive[0].id),
               "cur_value": 0,
               "goal": Number(curIncentive[0].goal),
             });
@@ -246,8 +301,8 @@ export default{
             if(curIncentive[0].options && curIncentive[0].options.length > 0){
               for(let option of curIncentive[0].options){
                 const eventRunBidwarOption = eventRunBidwarOptionRepository.create({
-                  "event_run_incentive_id": eventRunIncentive.id,
-                  "bidwar_option_id": option.id,
+                  "event_run_incentive_id": Number(eventRunIncentive.id),
+                  "bidwar_option_id": Number(option.id),
                   "cur_value": 0
                 });
                 await eventRunBidwarOptionRepository.save(eventRunBidwarOption);
@@ -273,7 +328,6 @@ export default{
         approved_incentives: approvedIncentives,
         goals: goals
       };
-
       return {success: resp};
     }catch(error){
       logger.log("error", "DB Error: " + JSON.stringify(error));

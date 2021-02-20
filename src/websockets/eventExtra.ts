@@ -4,5 +4,4 @@ export default{
   async getExtras() {
     return await API.getExtras();
   }
-
 };
