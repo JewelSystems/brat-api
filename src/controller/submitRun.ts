@@ -59,8 +59,8 @@ interface IGetSubmitRun{
       incentive_id: string
     }[];
   }[];
-  approved_incentives: any;//{},
-  goals: any;//{}
+  approved_incentives: Record<string, any>;//{},
+  goals: Record<string, any>;//{}
 }
 
 export default{

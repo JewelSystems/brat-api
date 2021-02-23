@@ -11,6 +11,7 @@ import userPermission from './userPermission';
 import submitRun from './submitRun';
 import eventSchedule from './eventSchedule';
 import runIncentive from './runIncentive';
+import donation from './donation';
 
 /*
 interface IConnection{
@@ -24,9 +25,15 @@ interface IConnection{
 }
 */
 
+interface IMsg{
+  endpoint: string;
+  id: number;
+  info: Record<string, any>;
+}
+
 const websocket = (server: Server) => {
   let counter = 0;
-  let adminUsers: any = {};
+  let adminUsers: Record<string, any> = {};
   const wss = new ws.Server({ server });
 
   wss.on('connection', function connection(ws: any) {
@@ -43,7 +50,7 @@ const websocket = (server: Server) => {
 
     ws.on('message', async function incoming(message: string) {
       console.log("Received: ", message);
-      let msg: any;
+      let msg: IMsg;
       let packet: any;
       try{
         msg = JSON.parse(message);
@@ -192,6 +199,8 @@ let loggedFunctionsAdmin = {
 
   updateIncentive: runIncentive.update,
   getRunIncentives: runIncentive.getRunIncentives,
+
+  updateIncentiveDonation: donation.updateIncentiveDonation,
 };
 
 // Logged User functions

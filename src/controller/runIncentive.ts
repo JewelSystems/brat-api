@@ -3,6 +3,7 @@ import logger from '../loaders/logger';
 import { getRepository } from 'typeorm';
 import BidwarOption from '../models/BidwarOption';
 import EventSchedule from '../models/EventSchedule';
+import EventRunIncentive from '../models/EventRunIncentive';
 
 interface CtrlResponse{
   success?: any;
@@ -53,18 +54,17 @@ export default{
 
       const runIncentives = await eventScheduleRepository
         .createQueryBuilder("event_schedule")
-        .leftJoinAndSelect("event_schedule.event_run_id", "event_run")
-        .leftJoinAndSelect("event_run.run_id", "run")
-        .leftJoinAndSelect(RunIncentive, "run_incentive", "run_incentive.run_id = run.id")
+        .leftJoinAndSelect(EventRunIncentive, "event_run_incentive", "event_run_incentive.event_run_id = event_schedule.event_run_id")
+        .leftJoinAndSelect(RunIncentive, "run_incentive", "run_incentive.id = event_run_incentive.incentive_id")
         .leftJoinAndSelect(BidwarOption, "bidwar_options", "bidwar_options.incentive_id = run_incentive.id")
+        .where(`event_schedule.id = ${scheduleId}`)
         .select([
-          'run_incentive.id as id',
+          'event_run_incentive.incentive_id as id',
           'run_incentive.name as name',
           "bidwar_options.option as 'option'"
         ])
-        .where(`event_schedule.id = ${scheduleId}`)
         .getRawMany();
-  
+
       const resp = [];
   
       for(let incentive of runIncentives){
