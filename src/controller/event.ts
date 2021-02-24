@@ -35,7 +35,7 @@ export default{
     try{
       const eventRepository = getRepository(Event);
 
-      const event = await eventRepository.findOne({ id: Number(id) });
+      const event = await eventRepository.findOneOrFail({ id: Number(id) });
       const resp = {
         "id": id,
         "active": '',

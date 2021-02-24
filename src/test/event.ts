@@ -1,20 +1,36 @@
+process.env.NODE_ENV = 'test';
+process.env.DB_NAME = 'brat-test';
 import { assert } from 'chai';
 import API from '../api/event';
-import { createConnection, getRepository } from 'typeorm';
+import { createConnection, getRepository, Repository } from 'typeorm';
 import Event from '../models/Event';
-/*
-beforeEach(async function() {
-  await Game.destroy({where: {}});
+
+let eventRepo: Repository<Event>;
+
+before(async function() {
+  await createConnection();
+  eventRepo = getRepository(Event);
+
+  await getRepository(Event)
+    .createQueryBuilder("event")
+    .delete()
+    .from(Event)
+    .execute();
 });
-*/
-createConnection();
+
+afterEach(async function() {
+  await getRepository(Event)
+    .createQueryBuilder("event")
+    .delete()
+    .from(Event)
+    .execute();
+});
 
 describe('EventAPI', async function(){
-  describe('API Create', async function(){
+  describe('API.create', async function(){
     it('API.create should return a successful response', async function(){
       const resp = JSON.stringify(await API.create("Evento", "www.donationlink.com", "2021-01-01", "2021-01-10"));
 
-      const eventRepo = getRepository(Event);
       const event = await eventRepo.findOne({ 
         "name": "Evento",
         "donation_link": "www.donationlink.com",
@@ -23,18 +39,16 @@ describe('EventAPI', async function(){
       });
 
       assert.equal(resp, JSON.stringify({"status":200,"msg":"createEvent","data":[{"name":"Evento","donation_link":"www.donationlink.com","active":"N","start":"2021-01-01","end":"2021-01-10","id": Number(event?.id) }],"type":"adminBroadcast"}));
-    
-      if(event) eventRepo.delete(event.id);
     });
     it('API.create should return a server error when a invalid input is received', async function(){
       const resp = JSON.stringify(await API.create("Evento", "www.donationlink.com", "", "2021-01-10"));
       assert.equal(resp, JSON.stringify({"status": 403, "msg": "Server error"}));
     });
   });
-  describe('Api update', async function(){
+  describe('API.update', async function(){
     it('API.update should return the updated event', async function(){
       await API.create("Evento", "www.donationlink.com", "2021-01-01", "2021-01-10");
-      const eventRepo = getRepository(Event);
+
       const event = await eventRepo.findOne({ 
         "name": "Evento",
         "donation_link": "www.donationlink.com",
@@ -55,12 +69,10 @@ describe('EventAPI', async function(){
       });
 
       assert.equal(resp, JSON.stringify({"status":200,"msg":"updateEvent","data":[{"id":event2?.id,"name":"Evento2","donation_link":"www.donationlink.com","active":"N","start":"2021-01-01","end":"2021-01-10"}],"type":"adminBroadcast"}));
-
-      if(event2) eventRepo.delete(event2.id);
     });
     it('API.update should return a server error when a invalid input is received', async function(){
       await API.create("Evento", "www.donationlink.com", "2021-01-01", "2021-01-10");
-      const eventRepo = getRepository(Event);
+      
       const event = await eventRepo.findOne({ 
         "name": "Evento",
         "donation_link": "www.donationlink.com",
@@ -74,6 +86,51 @@ describe('EventAPI', async function(){
       }
       
       assert.equal(resp, JSON.stringify({"status": 403, "msg": "Server error"}));
+    });
+  });
+  describe('API.updateEventState', async function(){
+    it('API.updateEventState should be able to update a Waiting event to Active', async function(){
+      await API.create("Evento", "www.donationlink.com", "2021-01-01", "2021-01-10");
+
+      const event = await eventRepo.findOne({ 
+        "name": "Evento",
+        "donation_link": "www.donationlink.com",
+        "start": "2021-01-01",
+        "end": "2021-01-10"
+      });
+
+      const resp = JSON.stringify(await API.updateEventState(String(event?.id)));
+      assert.equal(resp, JSON.stringify({
+        status: 200,
+        msg: 'updateEventState',
+        data: [ { id: event?.id, active: 'A' } ],
+        type: 'adminBroadcast'
+      }));
+    });
+    it('API.updateEventState should be able to update an Active event to Disabled', async function(){
+      await API.create("Evento", "www.donationlink.com", "2021-01-01", "2021-01-10");
+
+      const event = await eventRepo.findOne({ 
+        "name": "Evento"
+      });
+
+      await API.updateEventState(String(event?.id));
+      const resp = JSON.stringify(await API.updateEventState(String(event?.id)));
+      assert.equal(resp, JSON.stringify({
+        status: 200,
+        msg: 'updateEventState',
+        data: [ { id: event?.id, active: 'D' } ],
+        type: 'adminBroadcast'
+      }));
+    });
+    it('API.updateEventState should return an error if a unexistent id is provided', async function(){
+      const resp = JSON.stringify(await API.updateEventState(String(0)));
+      assert.equal(resp, JSON.stringify({"status":403,"msg":"Server error"}));
+    });
+  });
+  describe('API.getEvents', async function(){
+    it('API.getEvents should return the existent events', async function(){
+      console.log('ok');
     });
   });
 });

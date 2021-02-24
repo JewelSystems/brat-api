@@ -1,5 +1,7 @@
 import winston, { Logger } from 'winston';
 import config from '../config';
+import * as dotenv from "dotenv";
+dotenv.config();
 
 const transports = [];
 transports.push(
@@ -10,6 +12,10 @@ transports.push(
     )
   })
 );
+
+if(process.env.NODE_ENV === 'test'){
+  transports[0].silent = true;
+}
 
 const LoggerInstance: Logger = winston.createLogger({
   level: config.logs.level,

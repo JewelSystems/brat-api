@@ -1,18 +1,17 @@
+import * as dotenv from "dotenv";
+dotenv.config();
+
 import express, { Application } from 'express';
 import bp from 'body-parser';
 import helmet from 'helmet';
 import cors from 'cors';
 import http from 'http';
 import "reflect-metadata";
-import * as dotenv from "dotenv";
 
 import websocket from './websockets';
 import routes from './routes';
 import logger from './loaders/logger';
 import { createConnection } from 'typeorm';
-
-
-dotenv.config();
 
 const app: Application = express();
 const port = process.env.SV_PORT || 3000;
