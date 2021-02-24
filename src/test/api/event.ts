@@ -1,9 +1,9 @@
 process.env.NODE_ENV = 'test';
 process.env.DB_NAME = 'brat-test';
 import { assert } from 'chai';
-import API from '../api/event';
-import { createConnection, getRepository, Repository } from 'typeorm';
-import Event from '../models/Event';
+import API from '../../api/event';
+import { createConnection, getConnection, getRepository, Repository } from 'typeorm';
+import Event from '../../models/Event';
 
 let eventRepo: Repository<Event>;
 
@@ -130,7 +130,33 @@ describe('EventAPI', async function(){
   });
   describe('API.getEvents', async function(){
     it('API.getEvents should return the existent events', async function(){
-      console.log('ok');
+      await API.create("Evento1", "www.donationlink.com", "2021-01-01", "2021-01-10");
+      await API.create("Evento2", "www.donationlink.com", "2021-01-01", "2021-01-10");
+
+      const resp = JSON.stringify(await API.getEvents());
+      const event1 = await eventRepo.findOne({ 
+        "name": "Evento1"
+      });
+      const event2 = await eventRepo.findOne({ 
+        "name": "Evento2"
+      });
+
+      assert.equal(resp, JSON.stringify(
+        {"status":200,"msg":"listGames","data":[
+          [
+            {"id":String(event1?.id),"name":"Evento1","donation_link":"www.donationlink.com","active":"N","start":"2021-01-01","end":"2021-01-10"},
+            {"id":String(event2?.id),"name":"Evento2","donation_link":"www.donationlink.com","active":"N","start":"2021-01-01","end":"2021-01-10"}
+          ]
+        ]}
+      ));
+    });
+    it('API.getEvents shout return an error if there is no connections', async function(){
+      await getConnection().close();
+
+      const resp = JSON.stringify(await API.getEvents());
+      assert.equal(resp, JSON.stringify({ status: 403, msg: 'Server error' }));
+
+      await createConnection();
     });
   });
 });

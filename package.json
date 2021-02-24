@@ -7,7 +7,7 @@
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
     "build": "tsc -p .",
-    "test": "mocha -r ts-node/register src/test/*.ts",
+    "test": "mocha -r ts-node/register src/test/**/*.ts",
     "coverage": "nyc npm run test"
   },
   "keywords": [],
