@@ -1,6 +1,7 @@
 import logger from '../loaders/logger';
 import { getRepository } from 'typeorm';
 import EventExtra from '../models/EventExtra';
+import Event from '../models/Event';
 
 interface CtrlResponse{
   success?: any;
@@ -8,6 +9,29 @@ interface CtrlResponse{
 }
 
 export default{
+  async create( type: string, time: number): Promise<CtrlResponse>{
+    logger.log("info", "Starting game create function");
+    try{
+      const eventExtraRepository = getRepository(EventExtra);
+      const eventRepository = getRepository(Event);
+      
+      const event = await eventRepository.findOneOrFail({ active: "A" });
+
+      const eventExtra = eventExtraRepository.create({
+        event_id: event?.id,
+        type,
+        time
+      });
+
+      await eventExtraRepository.save(eventExtra);
+
+      return {success: eventExtra};
+    }catch(error){
+      logger.log("error", "DB Error: " + JSON.stringify(error));
+      return {error: "Server error"};
+    }
+  },
+
   async getExtras(): Promise<CtrlResponse>{
     logger.log("info", "Starting get all event extras function");
     try{

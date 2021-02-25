@@ -61,7 +61,7 @@ describe('UserPemissionAPI', async function(){
       
       assert.equal(resp, JSON.stringify({"status":200,"msg":"removePermission","data":["OK"]}));
     });
-    it('API.removePermission should return an if there is no connection', async function(){
+    it('API.removePermission should return an error if there is no connection', async function(){
       await getConnection().close();
 
       const resp = JSON.stringify(await API.removePermission('0', '0', 'admin'));

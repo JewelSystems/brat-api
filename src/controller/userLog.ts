@@ -1,3 +1,4 @@
+import logger from '../loaders/logger';
 import moment from 'moment';
 import { getRepository } from 'typeorm';
 import UserLog from '../models/UserLog';
@@ -17,7 +18,8 @@ export default {
       await userLogRepository.save(userLog);
 
     }catch(error){
-      console.log(error);
+      logger.log("error", "DB Error: " + JSON.stringify(error));
+      throw(error);
     }
   }
 };
