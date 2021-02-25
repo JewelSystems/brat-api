@@ -4,9 +4,19 @@ interface APIResponse{
   status: number;
   msg: string;
   data?: any;
+  type?: string;
 }
 
 export default {
+  async create(name: string, year: string): Promise<APIResponse>{
+    let response = await Controller.create(name, year);
+    if (response.error) {
+      return {"status": 403, "msg": response.error};
+    }
+    //Successful request
+    return {"status": 200, "msg": "createGame", data:[response.success], "type": "adminBroadcast"};
+  },
+
   async getGames(): Promise<APIResponse>{
     let response = await Controller.getGames();
     if (response.error) {

@@ -7,26 +7,25 @@ import Event from '../../models/Event';
 
 let eventRepo: Repository<Event>;
 
-before(async function() {
-  await createConnection();
-  eventRepo = getRepository(Event);
-
-  await getRepository(Event)
-    .createQueryBuilder("event")
-    .delete()
-    .from(Event)
-    .execute();
-});
-
-afterEach(async function() {
-  await getRepository(Event)
-    .createQueryBuilder("event")
-    .delete()
-    .from(Event)
-    .execute();
-});
-
 describe('EventAPI', async function(){
+  before(async function() {
+    eventRepo = getRepository(Event);
+  
+    await getRepository(Event)
+      .createQueryBuilder("event")
+      .delete()
+      .from(Event)
+      .execute();
+  });
+
+  afterEach(async function() {
+    await getRepository(Event)
+      .createQueryBuilder("event")
+      .delete()
+      .from(Event)
+      .execute();
+  });
+
   describe('API.create', async function(){
     it('API.create should return a successful response', async function(){
       const resp = JSON.stringify(await API.create("Evento", "www.donationlink.com", "2021-01-01", "2021-01-10"));
@@ -150,7 +149,7 @@ describe('EventAPI', async function(){
         ]}
       ));
     });
-    it('API.getEvents shout return an error if there is no connections', async function(){
+    it('API.getEvents should return an error if there is no connections', async function(){
       await getConnection().close();
 
       const resp = JSON.stringify(await API.getEvents());

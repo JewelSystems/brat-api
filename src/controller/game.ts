@@ -37,5 +37,24 @@ export default{
       logger.log("error", "DB Error: " + JSON.stringify(error));
       return {error: "Server error"};
     }
+  },
+
+  async create( name: string, year: string): Promise<CtrlResponse>{
+    logger.log("info", "Starting game create function");
+    try{
+      const gameRepository = getRepository(Game);
+
+      const game = gameRepository.create({
+        name: name,
+        year: year
+      });
+
+      await gameRepository.save(game);
+
+      return {success: game};
+    }catch(error){
+      logger.log("error", "DB Error: " + JSON.stringify(error));
+      return {error: "Server error"};
+    }
   }
 };

@@ -129,7 +129,6 @@ export default {
 
       return {success: userRuns};
     }catch(error){
-      console.log(error);
       logger.log("error", "DB Error: " + JSON.stringify(error));
       return {error: "Server error"};
     }
@@ -166,7 +165,6 @@ export default {
       
       return {success: users};
     }catch(error){
-      console.log(error);
       logger.log("error", "DB Error: " + JSON.stringify(error));
       return {error: "Server error"};
     }

@@ -20,7 +20,6 @@ export default{
       userLog.log(Number(updatedUser), Number(updaterUser), "unset_permission_"+permission);
       return {success: "OK"};
     }catch(error){
-      console.log(error);
       logger.log("error", "DB Error: " + JSON.stringify(error));
       return {error: "Server error"};
     }
@@ -37,7 +36,6 @@ export default{
       userLog.log(Number(updatedUser), Number(updaterUser), "set_permission_"+permission);
       return {success: "OK"};
     }catch(error){
-      console.log(error);
       logger.log("error", "DB Error: " + JSON.stringify(error));
       return {error: "Server error"};
     }

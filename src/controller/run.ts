@@ -99,6 +99,7 @@ export default{
 
       return { success: "Creation success" };
     }catch(error){
+      console.log(error);
       logger.log("error", "DB Error: " + JSON.stringify(error));
       return {error: "Server error"};
     }
