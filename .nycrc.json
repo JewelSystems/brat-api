@@ -1,0 +1,6 @@
+{
+  "include": "src",
+  "exclude": "dist",
+  "check-coverege": "true",
+  "all": true
+}
