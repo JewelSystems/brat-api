@@ -6,6 +6,7 @@ import SubmitRun from '../models/SubmitRun';
 import RunIncentive from '../models/RunIncentive';
 import BidwarOption from '../models/BidwarOption';
 import Game from '../models/Game';
+import Event from '../models/Event';
 
 interface CtrlResponse{
   success?: any;
@@ -42,7 +43,7 @@ export default{
       
       //Create RunRunner
       const runRunnerRepository = getRepository(RunRunner);
-      
+
       const runRunner: RunRunner = runRunnerRepository.create({
         runner_id: Number(runnerId),
         run_id: run.id
@@ -50,11 +51,15 @@ export default{
 
       await runRunnerRepository.save(runRunner);
       
+      //Find active event
+      const eventRepository = getRepository(Event);
+      const activeEvent = await eventRepository.findOneOrFail({ active: 'A' });
+
       //Create SubmitRun
       const submitRunRepository = getRepository(SubmitRun);
       
       const submitRun: SubmitRun = submitRunRepository.create({
-        event_id: 1,
+        event_id: activeEvent.id,
         run_id: run.id,
         reviewed: false,
         approved: false,
@@ -99,7 +104,6 @@ export default{
 
       return { success: "Creation success" };
     }catch(error){
-      console.log(error);
       logger.log("error", "DB Error: " + JSON.stringify(error));
       return {error: "Server error"};
     }

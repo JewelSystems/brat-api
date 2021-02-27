@@ -4,10 +4,11 @@ import { assert } from 'chai';
 import API from '../../api/user';
 import { createConnection, getConnection, getRepository, Repository } from 'typeorm';
 import User from '../../models/User';
+import userPermissionCtrl from '../../controller/userPermission';
 
 let userRepo: Repository<User>;
 
-describe.only('UserAPI', async function(){
+describe('UserAPI', async function(){
   before(async function() {
     userRepo = getRepository(User);
   
@@ -17,7 +18,6 @@ describe.only('UserAPI', async function(){
       .from(User)
       .execute();
   });
-/*
   afterEach(async function() {
     await getRepository(User)
       .createQueryBuilder("user")
@@ -25,7 +25,6 @@ describe.only('UserAPI', async function(){
       .from(User)
       .execute();
   });
-  */
   describe('API.create', async function(){
     it('API.create should successfully create an User', async function(){
       const resp = JSON.stringify(await API.create(
@@ -202,12 +201,12 @@ describe.only('UserAPI', async function(){
       assert.equal(resp, JSON.stringify({"status":403,"body":{"error":"User not found"}}));
     });
   });
-  describe.only('API.getUsers', async function(){
-    it('API.getUsers should return the existent users', async function(){
+  describe('API.getUsers', async function(){
+    it("API.getUsers should return the existent users and it's permissions", async function(){
       await API.create(
-        'Nome', 
+        'Nome1', 
         'Sobrenome', 
-        'Usuario', 
+        'Usuario1', 
         'Nickname', 
         'email@email.com', 
         '12345678', 
@@ -224,7 +223,7 @@ describe.only('UserAPI', async function(){
       await API.create(
         'Nome2', 
         'Sobrenome', 
-        'Usuario', 
+        'Usuario2', 
         'Nickname', 
         'email@email.com', 
         '12345678', 
@@ -238,9 +237,31 @@ describe.only('UserAPI', async function(){
         'http://www.instagram.com', 
         'http://www.youtube.com');
 
+      const user1 = await userRepo.findOneOrFail({ username: 'Usuario1' });
+      const user2 = await userRepo.findOneOrFail({ username: 'Usuario2' });
+
+      await userPermissionCtrl.addPermission(String(user1.id), String(user1.id), 'Admin');
+
       const resp = JSON.stringify(await API.getUsers());
 
-      assert.equal(resp, '');
+      assert.equal(resp, JSON.stringify({
+        "status":200,
+        "msg":"listUsers",
+        "data":[
+          [
+            {"id":String(user1.id),"first_name":"Nome1","last_name":"Sobrenome","username":"Usuario1","email":"email@email.com","permissions":["None","Admin"]},
+            {"id":String(user2.id),"first_name":"Nome2","last_name":"Sobrenome","username":"Usuario2","email":"email@email.com","permissions":["None"]}
+          ]
+        ]
+      }));
+    });
+    it("API.getUsers should return an error if there is no connection", async function(){
+      await getConnection().close();
+
+      const resp = JSON.stringify(await API.getUsers());
+      assert.equal(resp, JSON.stringify({"status":403,"msg":"Server error"}));
+
+      await createConnection();
     });
   });
 });

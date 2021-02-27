@@ -24,7 +24,7 @@ export default {
       return {"status": 403, "msg": response.error};
     }
     //Successful request
-    return {"status": 200, "msg": "listGames", data:[response.success]};
+    return {"status": 200, "msg": "createRun", data:[response.success]};
   },
 
   async createRunNGame(runnerId: string, category: string, estimatedTime: number, preferredTime: string, platform: string, name: string, year: string, incentives: IIncentive[]): Promise<APIResponse>{
