@@ -11,7 +11,7 @@ interface CtrlResponse{
 }
 
 export default{
-  async updateIncentiveDonation(first_name: string, last_name: string, email: string, value: string, incentive_id: string, option_name: string): Promise<CtrlResponse>{
+  async updateIncentiveNCreateDonation(first_name: string, last_name: string, email: string, value: string, incentive_id: string, option_name: string): Promise<CtrlResponse>{
     logger.log("info", "Starting donation create and update function");
     // Update game
     try{
@@ -23,7 +23,7 @@ export default{
       let eventRunOption: EventRunBidwarOption | undefined;
       let donation: Donation;
 
-      eventRunIncentive = await eventRunIncentiveRepository.findOne({ incentive_id: Number(incentive_id) });
+      eventRunIncentive = await eventRunIncentiveRepository.findOneOrFail({ incentive_id: Number(incentive_id) });
       if(eventRunIncentive){
         if(option_name){
           eventRunOption = await bidwarOptionRepository

@@ -7,8 +7,8 @@ interface APIResponse{
 }
 
 export default {
-  async updateIncentiveDonation(first_name: string, last_name: string, email: string, value: string, incentive_id: string, option: string): Promise<APIResponse> {
-    let response = await Controller.updateIncentiveDonation(first_name, last_name, email, value, incentive_id, option);
+  async updateIncentiveNCreateDonation(first_name: string, last_name: string, email: string, value: string, incentive_id: string, option: string): Promise<APIResponse> {
+    let response = await Controller.updateIncentiveNCreateDonation(first_name, last_name, email, value, incentive_id, option);
     if (response.error) {
       return {"status": 403, "msg": response.error};
     }

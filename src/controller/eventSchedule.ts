@@ -97,7 +97,6 @@ export default{
       const resp = await this.getEventSchedule();
       return {success: resp};
     }catch(error){
-      console.log(error);
       logger.log("error", "DB Error: " + JSON.stringify(error));
       return {error: "Server error"};
     }
@@ -129,7 +128,6 @@ export default{
       const resp = await this.getEventSchedule();
       return {success: resp};
     }catch(error){
-      console.log(error);
       logger.log("error", "DB Error: " + JSON.stringify(error));
       return {error: "Server error"};
     }
@@ -145,7 +143,6 @@ export default{
       const resp = await this.getEventSchedule();
       return {success: resp};
     }catch(error){
-      console.log(error);
       logger.log("error", "DB Error: " + JSON.stringify(error));
       return {error: "Server error"};
     }

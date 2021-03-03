@@ -10,8 +10,8 @@ interface IDonation{
 }
 
 export default{
-  async updateIncentiveDonation(packet: IDonation){
-    return await API.updateIncentiveDonation(packet.first_name, packet.last_name, packet.email, packet.value, packet.incentive_id, packet.option);
+  async updateIncentiveNCreateDonation(packet: IDonation){
+    return await API.updateIncentiveNCreateDonation(packet.first_name, packet.last_name, packet.email, packet.value, packet.incentive_id, packet.option);
   }
 
 };

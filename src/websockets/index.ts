@@ -200,7 +200,7 @@ let loggedFunctionsAdmin = {
   updateIncentive: runIncentive.update,
   getRunIncentives: runIncentive.getRunIncentives,
 
-  updateIncentiveDonation: donation.updateIncentiveDonation,
+  updateIncentiveDonation: donation.updateIncentiveNCreateDonation,
 };
 
 // Logged User functions

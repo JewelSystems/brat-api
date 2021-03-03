@@ -10,6 +10,7 @@ import Event from '../../models/Event';
 import UserController from '../../controller/user';
 import GameController from '../../controller/game';
 import EventController from '../../controller/event';
+import BidwarOption from '../../models/BidwarOption';
 
 
 let runRepo: Repository<Run>;
@@ -77,6 +78,12 @@ describe('RunAPI', async function(){
       .createQueryBuilder("event")
       .delete()
       .from(Event)
+      .execute();
+
+    await getRepository(BidwarOption)
+      .createQueryBuilder("bidwar_option")
+      .delete()
+      .from(BidwarOption)
       .execute();
   });
 

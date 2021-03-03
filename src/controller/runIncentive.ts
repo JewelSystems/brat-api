@@ -26,6 +26,8 @@ export default{
       const bidwarOptionRepository = getRepository(BidwarOption);
       const runIncentiveRepository = getRepository(RunIncentive);
 
+      await runIncentiveRepository.findOneOrFail(incentive.id);
+      
       if(!incentive.goal){
         for(let option of incentive.bidwar_options){
           bidwarOptionRepository.update(option.id, {
@@ -38,7 +40,8 @@ export default{
         name: incentive.name,
         comment: incentive.comment
       });
-      
+
+
       return {success: incentive};
     }catch(error){
       logger.log("error", "DB Error: " + JSON.stringify(error));
