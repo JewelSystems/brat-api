@@ -34,7 +34,7 @@ interface IIncentive{
   goal?: number;
 }
 
-describe.skip('DonationAPI', async function(){
+describe('DonationAPI', async function(){
   before(async function() {
     runIncentiveRepo = getRepository(RunIncentive);
     bidwarOptionRepo = getRepository(BidwarOption);
@@ -105,8 +105,15 @@ describe.skip('DonationAPI', async function(){
   });
 
   describe('API.updateIncentiveNCreateDonation', async function(){
-    it('API.updateIncentiveNCreateDonation should create an donation and update an incetive current value', async function(){
-      console.log('a');
+    it.skip('API.updateIncentiveNCreateDonation should create an donation and update an incetive current value', async function(){
+      const resp = JSON.stringify(await API.updateIncentiveNCreateDonation('Name', 'Last Name', 'email@email.com', '100', incentiveId1, optionId));
+
+      assert.equal(resp, '');
+    });
+    it('API.updateIncentiveNCreateDonation should return an error if there is no incentive with this id', async function(){
+      const resp = JSON.stringify(await API.updateIncentiveNCreateDonation('Name', 'Last Name', 'email@email.com', '100', '', ''));
+
+      assert.equal(resp, JSON.stringify({"status":403,"msg":"Server error"}));
     });
   });
 });

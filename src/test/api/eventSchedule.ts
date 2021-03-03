@@ -2,7 +2,7 @@ process.env.NODE_ENV = 'test';
 process.env.DB_NAME = 'brat-test';
 import { assert } from 'chai';
 import API from '../../api/eventSchedule';
-import { getRepository, Repository } from 'typeorm';
+import { createConnection, getConnection, getRepository, Repository } from 'typeorm';
 import EventController from '../../controller/event';
 import Event from '../../models/Event';
 import EventSchedule from '../../models/EventSchedule';
@@ -248,11 +248,74 @@ describe('EventScheduleAPI', async function(){
         ]));
     });
     it('API.updateEventSchedule should return an error if there is no data', async function(){
-      
-      
       const resp = JSON.stringify((await API.updateEventSchedule('')));
 
       assert.equal(resp, JSON.stringify({"status":403,"msg":"Server error"}));
+    });
+  });
+
+  describe('API.getEventSchedule', async function(){
+    it('API.getEventSchedule should return the current schedule orded by order', async function(){
+      const setups: ISetup[] = [{
+        type: "setup",
+        event_id: String(event.id),
+        event_name: event.name,
+        event_date: event.start,
+        game: 'Setup',
+        duration: 600,
+        order: 2
+      },{
+        type: "setup",
+        event_id: String(event.id),
+        event_name: event.name,
+        event_date: event.start,
+        game: 'Setup',
+        duration: 600,
+        order: 1
+      }];
+      
+      const data = "[{\"order\": 1}, {\"order\": 2}]";
+
+      const schedule = (await API.createSetupEventSchedule(data, setups)).data[0].success;
+
+      const resp = JSON.stringify((await API.getEventSchedule()).data[0]);
+
+      assert.equal(resp, JSON.stringify(
+        [
+          {"id":schedule[0].id,"order":"1","type":"setup","event_id":String(event.id),"event_run_id":null,"event_extra_id":null,"extra_time":null,"setup_time":"600","active":0,"done":0,"final_time":null,"event_name":"Evento","event_date":"2021-01-01T03:00:00.000Z","game":"Setup","duration":"600","category":null,"interval":null,"platform":null,"runner":null,"stream_link":null,"event_extra_time":null,"event_extra_type":null},
+          {"id":schedule[1].id,"order":"2","type":"setup","event_id":String(event.id),"event_run_id":null,"event_extra_id":null,"extra_time":null,"setup_time":"600","active":0,"done":0,"final_time":null,"event_name":"Evento","event_date":"2021-01-01T03:00:00.000Z","game":"Setup","duration":"600","category":null,"interval":null,"platform":null,"runner":null,"stream_link":null,"event_extra_time":null,"event_extra_type":null}
+        ]));
+    });
+    it('API.getEventSchedule should return an error if there is no connection', async function(){
+      await getConnection().close();
+
+      const setups: ISetup[] = [{
+        type: "setup",
+        event_id: String(event.id),
+        event_name: event.name,
+        event_date: event.start,
+        game: 'Setup',
+        duration: 600,
+        order: 2
+      },{
+        type: "setup",
+        event_id: String(event.id),
+        event_name: event.name,
+        event_date: event.start,
+        game: 'Setup',
+        duration: 600,
+        order: 1
+      }];
+      
+      const data = "";
+
+      await API.createSetupEventSchedule(data, setups);
+
+      const resp = JSON.stringify(await API.getEventSchedule());
+
+      assert.equal(resp, JSON.stringify({"status":403,"msg":"Server error"}));
+
+      await createConnection();
     });
   });
 });
