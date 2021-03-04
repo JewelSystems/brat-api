@@ -7,6 +7,7 @@ import EventRunBidwarOption from '../models/EventRunBidwarOption';
 import RunIncentive from '../models/RunIncentive';
 import RunRunner from '../models/RunRunner';
 import SubmitRun from '../models/SubmitRun';
+import { ExceptionHandler } from 'winston';
 
 interface CtrlResponse{
   success?: any;
@@ -253,7 +254,7 @@ export default{
           eventRunRepository.delete(eventRun.id);
         }
       }
-  
+      
       return {success: resp};
     }catch(error){
       logger.log("error", "DB Error: " + JSON.stringify(error));
