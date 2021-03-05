@@ -4,6 +4,7 @@ import User from '../models/User';
 import UserPermission from '../models/UserPemission';
 import userLog from '../controller/userLog';
 import { getManager, getRepository } from 'typeorm';
+import Permission from '../models/Permission';
 
 
 interface CtrlResponse{
@@ -110,10 +111,49 @@ export default {
   async get(id: string): Promise<CtrlResponse>{
     logger.log("info", "Starting user get function");
     try{
-      const entityManager = getManager();
-      const user = await entityManager.query('SELECT users.id, users.first_name, users.last_name, users.username, users.email, users.gender, users.phone_number, users.stream_link, users.twitch, users.twitter, users.facebook, users.instagram, users.youtube, GROUP_CONCAT(permissions.permission) as `permissions` FROM users, user_permissions, permissions WHERE users.id = ' +id+ ' AND users.id = user_permissions.user_id AND user_permissions.permission_id = permissions.id GROUP BY users.id');
+      //const entityManager = getManager();
+      //const user = await entityManager.query('SELECT users.id, users.first_name, users.last_name, users.username, users.email, users.gender, users.phone_number, users.stream_link, users.twitch, users.twitter, users.facebook, users.instagram, users.youtube, GROUP_CONCAT(permissions.permission) as `permissions` FROM users, user_permissions, permissions WHERE users.id = ' +id+ ' AND users.id = user_permissions.user_id AND user_permissions.permission_id = permissions.id GROUP BY users.id');
+      //console.log(user);
 
-      return { success: user };
+      const userRepo = getRepository(User);
+      const userTemp = await userRepo
+        .createQueryBuilder("user")
+        .leftJoinAndSelect(UserPermission, "user_permissions", `user_permissions.user_id = '${id}'`)
+        .leftJoinAndSelect(Permission, "permissions", `permissions.id = user_permissions.permission_id`)
+        .where(`user.id = ${id}`)
+        .select(
+          [
+            "user.id as id",
+            "user.first_name as first_name",
+            "user.last_name as last_name",
+            "user.username as username",
+            "user.email as email",
+            "user.gender as gender",
+            "user.phone_number as phone_number",
+            "user.stream_link as stream_link",
+            "user.twitch as twitch",
+            "user.twitter as twitter",
+            "user.facebook as facebook",
+            "user.instagram as instagram",
+            "user.youtube as youtube",
+            "permissions.permission as 'permissions'"
+          ]
+        )
+        .getRawMany();
+
+      let permissions = '';
+      for(let item of userTemp){
+        if(!permissions) {
+          permissions += item.permissions;
+        }else{
+          permissions += ","+item.permissions;
+        }
+      }
+
+      if(!permissions || permissions === "null") throw "An user should have permissions";
+      userTemp[0].permissions = permissions;
+
+      return { success: [userTemp[0]] };
     }catch(error){
       logger.log("error", "DB Error: " + JSON.stringify(error));
       return {error: "Server error"};

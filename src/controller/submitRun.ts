@@ -7,7 +7,6 @@ import EventRunBidwarOption from '../models/EventRunBidwarOption';
 import RunIncentive from '../models/RunIncentive';
 import RunRunner from '../models/RunRunner';
 import SubmitRun from '../models/SubmitRun';
-import { ExceptionHandler } from 'winston';
 
 interface CtrlResponse{
   success?: any;
@@ -290,7 +289,7 @@ export default{
               "goal": Number(curIncentive[0].goal)
             });
           }else{
-            //If the event run incentive wasn't found, create.
+            //If the event run incentive wasn't found, create it.
             const eventRunIncentive = eventRunIncentivesRepository.create({
               "event_run_id": Number(eventRunInfo.event_run.id),
               "incentive_id": Number(curIncentive[0].id),

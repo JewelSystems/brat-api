@@ -9,36 +9,38 @@ import UserController from '../../controller/user';
 import User from '../../models/User';
 import GameController from '../../controller/game';
 import EventController from '../../controller/event';
+import SubmitRunController from '../../controller/submitRun';
 import runAPI from '../../api/run';
 import Game from '../../models/Game';
 import Event from '../../models/Event';
 import BidwarOption from '../../models/BidwarOption';
+import SubmitRun from '../../models/SubmitRun';
+import Run from '../../models/Run';
+import EventRunIncentive from '../../models/EventRunIncentive';
+import EventRunBidwarOption from '../../models/EventRunBidwarOption';
 
 
-let runIncentiveRepo: Repository<RunIncentive>;
+let submitRunRepo: Repository<SubmitRun>;
 let userRepo: Repository<User>;
+let runRepo: Repository<Run>;
+let runIncentiveRepo: Repository<RunIncentive>;
 let bidwarOptionRepo: Repository<BidwarOption>;
-let donationRepo: Repository<Donation>;
 
 let userId: string;
 let gameId: string;
-let incentiveId1: string;
-let incentiveId2: string;
-let optionId: string;
+let runId: string;
+let submitRunId: string;
+let incentiveIds: string[] = [];
+let optionIds: string[] = [];
 
-interface IIncentive{
-  id: string;
-  name: string;
-  comment: string;
-  bidwar_options: {id: string; option: string; incentive_id: string}[];
-  goal?: number;
-}
 
 describe('DonationAPI', async function(){
   before(async function() {
+    submitRunRepo = getRepository(SubmitRun);
+    userRepo = getRepository(User);
+    runRepo = getRepository(Run);
     runIncentiveRepo = getRepository(RunIncentive);
     bidwarOptionRepo = getRepository(BidwarOption);
-    donationRepo = getRepository(Donation);
   
     await getRepository(RunIncentive)
       .createQueryBuilder("runIncentive")
@@ -66,10 +68,57 @@ describe('DonationAPI', async function(){
       ]},
       {"type": 'none', "comment": "comment2", "name": "name2", options:[]}
     ]);
+    
+    runId = String((await runRepo.find())[0].id);
+    submitRunId = String((await submitRunRepo.find())[0].id);
 
-    incentiveId1 = String((await runIncentiveRepo.findOneOrFail({ name: 'name1' })).id);
-    incentiveId2 = String((await runIncentiveRepo.findOneOrFail({ name: 'name2' })).id);
-    optionId = String((await bidwarOptionRepo.findOneOrFail({ option: 'option1' })).id);
+    const incentives = await runIncentiveRepo.find();
+    for(let incentive of incentives){
+      incentiveIds.push(String(incentive.id));
+    }
+
+    const options = await bidwarOptionRepo.find();
+    for(let option of options){
+      optionIds.push(String(option.id));
+    }
+
+    const submitRunIncentives = 
+    [
+      {
+        id: incentiveIds[0],
+        run_id: runId,
+        type: "private",
+        comment: "comment1",
+        name: "name1",
+        options: 
+        [
+          {
+            id: optionIds[0],
+            name: "option1",
+          },
+          {
+            id: optionIds[1],
+            name: "option2",
+          },
+          {
+            id: optionIds[2],
+            name: "option3",
+          },
+        ],
+        goal: 0
+      },
+      {
+        id: incentiveIds[1],
+        run_id: runId,
+        type: "none",
+        comment: "comment2",
+        name: "name2",
+        options: [],
+        goal: 300
+      }
+    ];
+
+    await SubmitRunController.updateSubmitRunNRunIncentives(submitRunId, true, true, false, submitRunIncentives);
   });
 
   after(async function(){
@@ -102,14 +151,33 @@ describe('DonationAPI', async function(){
       .delete()
       .from(Donation)
       .execute();
+
+    await getRepository(EventRunIncentive)
+      .createQueryBuilder("event_run_incentive")
+      .delete()
+      .from(EventRunIncentive)
+      .execute();
+
+    await getRepository(EventRunBidwarOption)
+      .createQueryBuilder("event_run_bidwar_option")
+      .delete()
+      .from(EventRunBidwarOption)
+      .execute();
   });
 
   describe('API.updateIncentiveNCreateDonation', async function(){
-    it.skip('API.updateIncentiveNCreateDonation should create an donation and update an incetive current value', async function(){
-      const resp = JSON.stringify(await API.updateIncentiveNCreateDonation('Name', 'Last Name', 'email@email.com', '100', incentiveId1, optionId));
+    it('API.updateIncentiveNCreateDonation should create an donation and update an bidawr option current value', async function(){
+      const resp = JSON.stringify(await API.updateIncentiveNCreateDonation('Name', 'Last Name', 'email@email.com', '300', incentiveIds[0], 'option1'));
 
-      assert.equal(resp, '');
+      assert.equal(resp, JSON.stringify({"status":200,"msg":"updateDonation","data":["Update success"]}));
     });
+
+    it('API.updateIncentiveNCreateDonation should create an donation and update an incetive current value', async function(){
+      const resp = JSON.stringify(await API.updateIncentiveNCreateDonation('Name', 'Last Name', 'email@email.com', '300', incentiveIds[1], ''));
+
+      assert.equal(resp, JSON.stringify({"status":200,"msg":"updateDonation","data":["Update success"]}));
+    });
+
     it('API.updateIncentiveNCreateDonation should return an error if there is no incentive with this id', async function(){
       const resp = JSON.stringify(await API.updateIncentiveNCreateDonation('Name', 'Last Name', 'email@email.com', '100', '', ''));
 

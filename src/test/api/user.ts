@@ -25,6 +25,7 @@ describe('UserAPI', async function(){
       .from(User)
       .execute();
   });
+
   describe('API.create', async function(){
     it('API.create should successfully create an User', async function(){
       const resp = JSON.stringify(await API.create(
@@ -199,6 +200,32 @@ describe('UserAPI', async function(){
       const resp = JSON.stringify(await API.get("-1"));
 
       assert.equal(resp, JSON.stringify({"status":403,"body":{"error":"User not found"}}));
+    });
+    it('API.get should return an error if the user does not have any permission', async function(){
+      await API.create(
+        'Nome', 
+        'Sobrenome', 
+        'Usuario', 
+        'Nickname', 
+        'email@email.com', 
+        '12345678', 
+        'M', 
+        '2000-01-01', 
+        '021999999999', 
+        'http://www.streamlink.com', 
+        'http://www.twitch.com', 
+        'http://www.twitter.com', 
+        'http://www.facebook.com', 
+        'http://www.instagram.com', 
+        'http://www.youtube.com');
+
+      const userId = (await userRepo.findOneOrFail({ 'first_name': 'Nome' })).id;
+
+      userPermissionCtrl.removePermission(String(userId), String(userId), "None");
+
+      const resp = JSON.stringify(await API.get(String(userId)));
+
+      assert.equal(resp, JSON.stringify({"status":403,"body":{"error":"Server error"}}));
     });
   });
   describe('API.getUsers', async function(){

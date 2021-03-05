@@ -133,49 +133,6 @@ describe('submitRunAPI', async function(){
       .from(BidwarOption)
       .execute();
   });
-  
-  describe('API.getSubmitRuns', async function(){
-    it('API.getSubmitRuns should return current submitted runs', async function(){
-      const resp = JSON.stringify(await API.getSubmitRuns());
-
-      assert.equal(resp, JSON.stringify(
-        {
-          "status":200,
-          "msg":"getSubmitRuns",
-          "data":
-          [
-            [
-              {
-                "id":submitRunId,"event_name":"Evento","game_name":"Jogo","category":"100%","platform":"PC","time_slot":"0001","reviewed":0,"approved":0,"waiting":0,"runner":"Nickname",
-                "incentives":
-                [
-                  {"id":incentiveIds[0],"run_id":runId,"type":"private","comment":"comment1","name":"name1",
-                    "BidwarOptions":
-                    [
-                      {"id":optionIds[0],"option":"option1","incentive_id":incentiveIds[0]},
-                      {"id":optionIds[1],"option":"option2","incentive_id":incentiveIds[0]},
-                      {"id":optionIds[2],"option":"option3","incentive_id":incentiveIds[0]}
-                    ]},
-                  {"id":incentiveIds[1],"run_id":runId,"type":"public","comment":"comment2","name":"name2",
-                    "BidwarOptions":[]},
-                  {"id":incentiveIds[2],"run_id":runId,"type":"none","comment":"comment3","name":"name3",
-                    "BidwarOptions":[]}
-                ],"approved_incentives":{},"goals":{}
-              }
-            ]
-          ]}));
-    });
-    it.skip('API.getSubmitRuns should return an error if there is no connection', async function(){
-      await getConnection().close();
-
-      const resp = JSON.stringify(await API.getSubmitRuns());
-
-      await createConnection();
-
-      assert(resp, JSON.stringify({"status":403,"msg":"Server error"}));
-
-    });
-  });
 
   describe('API.update', async function(){
     it('API.update should update a scheduled item state', async function(){
@@ -198,6 +155,73 @@ describe('submitRunAPI', async function(){
     });
     it('API.update should return an error if a inexistent run was given', async function(){
       const resp = JSON.stringify(await API.update('', true, true, false));
+      assert.equal(resp, JSON.stringify({"status":403,"msg":"Server error"}));
+    });
+  });
+
+  describe('API.updateSubmitRunNRunIncentives', async function(){
+    it("API.updateSubmitRunNRunIncentives should be able to change a submitted run state and update it's incentives states", async function(){
+      const incentives = 
+      [
+        {
+          id: incentiveIds[0],
+          run_id: runId,
+          type: "private",
+          comment: "comment1",
+          name: "name1",
+          options: 
+          [
+            {
+              id: optionIds[0],
+              name: "option1",
+            },
+            {
+              id: optionIds[1],
+              name: "option2",
+            },
+            {
+              id: optionIds[2],
+              name: "option3",
+            },
+          ],
+          goal: 0
+        }
+      ];
+
+      const resp = JSON.stringify(await API.updateSubmitRunNRunIncentives(submitRunId, true, true, false, incentives));
+
+      assert.equal(resp, `{"status":200,"msg":"updateSubmitRunsNRunIncentives","data":[{"id":"${submitRunId}","reviewed":true,"approved":true,"waiting":false,"approved_incentives":{"${incentiveIds[0]}":true,"${incentiveIds[1]}":false,"${incentiveIds[2]}":false},"goals":{}}],"type":"adminBroadcast"}`);
+    });
+    it("API.updateSubmitRunNRunIncentives should return return an error if missing data", async function(){
+      const incentives = 
+      [
+        {
+          id: incentiveIds[0],
+          run_id: runId,
+          type: "private",
+          comment: "comment1",
+          name: "name1",
+          options: 
+          [
+            {
+              id: optionIds[0],
+              name: "option1",
+            },
+            {
+              id: optionIds[1],
+              name: "option2",
+            },
+            {
+              id: optionIds[2],
+              name: "option3",
+            },
+          ],
+          goal: 0
+        }
+      ];
+
+      const resp = JSON.stringify(await API.updateSubmitRunNRunIncentives('', true, true, false, incentives));
+
       assert.equal(resp, JSON.stringify({"status":403,"msg":"Server error"}));
     });
   });
@@ -227,11 +251,24 @@ describe('submitRunAPI', async function(){
       assert.equal(resp, JSON.stringify({"status":403,"msg":"Server error"}));
     });
   });
+    
+  describe('API.getSubmitRuns', async function(){
+    it('API.getSubmitRuns should return current submitted runs', async function(){
+      const resp = JSON.stringify(await API.getSubmitRuns());
 
-  describe('API.updateSubmitRunNRunIncentives', async function(){
-    it('API.updateSubmitRunNRunIncentives', async function(){
-      //API.updateSubmitRunNRunIncentives(submitRunId, true, true, false, );
+      const temp = `{"status":200,"msg":"getSubmitRuns","data":[[{"id":"${submitRunId}","event_name":"Evento","game_name":"Jogo","category":"100%","platform":"PC","time_slot":"0001","reviewed":1,"approved":0,"waiting":0,"runner":"Nickname","incentives":[{"id":"${incentiveIds[0]}","run_id":"${runId}","type":"private","comment":"comment1","name":"name1","BidwarOptions":[{"id":"${optionIds[0]}","option":"option1","incentive_id":"${incentiveIds[0]}"},{"id":"${optionIds[1]}","option":"option2","incentive_id":"${incentiveIds[0]}"},{"id":"${optionIds[2]}","option":"option3","incentive_id":"${incentiveIds[0]}"}]},{"id":"${incentiveIds[1]}","run_id":"${runId}","type":"public","comment":"comment2","name":"name2","BidwarOptions":[]},{"id":"${incentiveIds[2]}","run_id":"${runId}","type":"none","comment":"comment3","name":"name3","BidwarOptions":[]}],"approved_incentives":{"${incentiveIds[0]}":"false","${incentiveIds[1]}":"false","${incentiveIds[2]}":"false"},"goals":{}}]]}`;
+
+      assert.equal(resp, temp);
+    });
+    it('API.getSubmitRuns should return an error if there is no connection', async function(){
+      await getConnection().close();
+
+      const resp = JSON.stringify(await API.getSubmitRuns());
+
+      await createConnection();
+
+      assert(resp, JSON.stringify({"status":403,"msg":"Server error"}));
+
     });
   });
-
 });
