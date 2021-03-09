@@ -12,6 +12,7 @@ import submitRun from './submitRun';
 import eventSchedule from './eventSchedule';
 import runIncentive from './runIncentive';
 import donation from './donation';
+import eventRun from './eventRun';
 
 /*
 interface IConnection{
@@ -185,8 +186,9 @@ let loggedFunctionsAdmin = {
   getEventRun: eventRun.get,
   updateEventRun: eventRun.update,
   deleteEventRun: eventRun.delete,
-
   */
+  getEventRuns: eventRun.getEventRuns,
+
   createEventSchedule: eventSchedule.create,
   getEventSchedule: eventSchedule.getEventSchedule,
   updateEventSchedule: eventSchedule.updateEventSchedule,

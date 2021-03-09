@@ -24,7 +24,7 @@ export default{
       return {"status": 403, "msg": response.error};
     }
     //Successful request
-    return {"status": 200, "msg": "createEventSchedule", data:[response.success]};
+    return {"status": 200, "msg": "createEventSchedule", data:[response.success], "type": "adminBroadcast"};
 
   },
 
