@@ -3,13 +3,27 @@ process.env.DB_NAME = 'brat-test';
 import { assert } from 'chai';
 import API from '../../api/eventSchedule';
 import { createConnection, getConnection, getRepository, Repository } from 'typeorm';
-import EventController from '../../controller/event';
+import EventCtrl from '../../controller/event';
+import GameCtrl from '../../controller/game';
+import RunCtrl from '../../controller/run';
+import SubmitRunCtrl from '../../controller/submitRun';
 import Event from '../../models/Event';
 import EventSchedule from '../../models/EventSchedule';
+import UserCtrl from '../../controller/user';
+import User from '../../models/User';
+import SubmitRun from '../../models/SubmitRun';
+import Run from '../../models/Run';
+import Game from '../../models/Game';
+import BidwarOption from '../../models/BidwarOption';
 
 let eventScheduleRepo: Repository<EventSchedule>;
+let userRepo: Repository<User>;
+let submitRunRepo: Repository<SubmitRun>;
+
 
 let event: Event;
+let gameId: string;
+let eventRunId: string;
 
 interface ISetup{
   type: string,
@@ -24,6 +38,8 @@ interface ISetup{
 describe('EventScheduleAPI', async function(){
   before(async function() {
     eventScheduleRepo = getRepository(EventSchedule);
+    userRepo = getRepository(User);
+    submitRunRepo = getRepository(SubmitRun);
   
     await getRepository(Event)
       .createQueryBuilder("event")
@@ -37,8 +53,33 @@ describe('EventScheduleAPI', async function(){
       .from(EventSchedule)
       .execute();
 
-    event = (await EventController.create('Evento', 'www.donation.com.br', '2021-01-01', '2021-02-01')).success;
-    await EventController.updateEventState(String(event.id));
+    event = (await EventCtrl.create('Evento', 'www.donation.com.br', '2021-01-01', '2021-02-01')).success;
+    await EventCtrl.updateEventState(String(event.id));
+
+    await UserCtrl.create('Nome', 'Sobrenome', 'Usuario', 'Nickname', 'email@email.com', '12345678', 'M', '2000/01/01', '021999999999', '', '', '', '', '', '');
+
+    userRepo = getRepository(User);
+    const user = (await userRepo.find())[0];
+    const userId = String(user.id);
+
+    await GameCtrl.create('Jogo', '2000');
+    gameId = (await GameCtrl.getGames()).success[0].id;
+
+    const eventId = event.id;
+
+    await RunCtrl.create(userId, gameId, "100%", 600, '0001', 'PC', [
+      {"type": 'private', "comment": "comment1", "name": "name1", options:[
+        {"name": "option1"},
+        {"name": "option2"},
+        {"name": "option3"},
+      ]},
+      {"type": 'public', "comment": "comment2", "name": "name2", options:[]},
+      {"type": 'none', "comment": "comment3", "name": "name3", options:[]}
+    ]);
+
+    const submitRunId = String((await submitRunRepo.find())[0].id);
+
+    eventRunId = (await SubmitRunCtrl.update(submitRunId, true, true, false)).success.event_run.id;
   });
   
   after(async function(){
@@ -61,8 +102,67 @@ describe('EventScheduleAPI', async function(){
       .delete()
       .from(EventSchedule)
       .execute();
+
+    await getRepository(User)
+      .createQueryBuilder("user")
+      .delete()
+      .from(User)
+      .execute();
+
+    await getRepository(Run)
+      .createQueryBuilder("run")
+      .delete()
+      .from(Run)
+      .execute();
+
+    await getRepository(Game)
+      .createQueryBuilder("game")
+      .delete()
+      .from(Game)
+      .execute();
+
+    await getRepository(BidwarOption)
+      .createQueryBuilder("bidwar_option")
+      .delete()
+      .from(BidwarOption)
+      .execute();
   });
   
+  describe('API.create', async function(){
+    it('API.create should create a new row on the event schedule table, for an event run', async function(){
+      const resp = JSON.stringify(await API.create("1", 'run', eventRunId, '', '0'));
+      
+      const schedule = await eventScheduleRepo.findOneOrFail({ type: 'run' });
+
+      assert.equal(resp, JSON.stringify(
+        {
+          "status":200,
+          "msg":"createEventSchedule",
+          "data":
+          [
+            {
+              "order":1,
+              "type":"run",
+              "event_id":schedule.event_id,
+              "event_run_id":eventRunId,
+              "extra_time":0,
+              "active":false,
+              "done":false,
+              "event_extra_id":null,
+              "setup_time":null,
+              "final_time":null,
+              "id":Number(schedule.id)
+            }
+          ]
+        }));
+    });
+    it('API.create should return a error if invalid data is used', async function(){
+      const resp = JSON.stringify(await API.create('','','','',''));
+
+      assert.equal(resp, JSON.stringify({"status":403,"msg":"Server error"}));
+    });
+  });
+
   describe('API.createSetupEventSchedule', async function(){
     it('API.createSetupEventSchedule should create a new setup', async function(){
       const data = "[{\"order\": 1}]";

@@ -4,7 +4,12 @@ import { assert } from 'chai';
 import API from '../../api/user';
 import { createConnection, getConnection, getRepository, Repository } from 'typeorm';
 import User from '../../models/User';
-import userPermissionCtrl from '../../controller/userPermission';
+import UserPermissionCtrl from '../../controller/userPermission';
+import RunCtrl from '../../controller/run';
+import EventCtrl from '../../controller/event';
+import Run from '../../models/Run';
+import Event from '../../models/Event';
+import Game from '../../models/Game';
 
 let userRepo: Repository<User>;
 
@@ -24,7 +29,26 @@ describe('UserAPI', async function(){
       .delete()
       .from(User)
       .execute();
+
+    await getRepository(Event)
+      .createQueryBuilder("event")
+      .delete()
+      .from(Event)
+      .execute();
+  
+    await getRepository(Run)
+      .createQueryBuilder("run")
+      .delete()
+      .from(Run)
+      .execute();
+  
+    await getRepository(Game)
+      .createQueryBuilder("game")
+      .delete()
+      .from(Game)
+      .execute();
   });
+
 
   describe('API.create', async function(){
     it('API.create should successfully create an User', async function(){
@@ -143,6 +167,53 @@ describe('UserAPI', async function(){
       assert.equal(resp, JSON.stringify({"status":403,"body":{"error":"Username already exists"}}));
     });
   });
+  describe('API.getUserRuns', async function(){
+    it('API.getUserRuns should return the runs of an user', async function(){
+      await API.create(
+        'Nome', 
+        'Sobrenome', 
+        'Usuario', 
+        'Nickname', 
+        'email@email.com', 
+        '12345678', 
+        'M', 
+        '2000-01-01', 
+        '021999999999', 
+        'http://www.streamlink.com', 
+        'http://www.twitch.com', 
+        'http://www.twitter.com', 
+        'http://www.facebook.com', 
+        'http://www.instagram.com', 
+        'http://www.youtube.com');
+
+      const userId = (await userRepo.findOneOrFail({ 'first_name': 'Nome' })).id;
+
+      const eventId = (await EventCtrl.create('Evento', 'www.donation.com.br', '2021-01-01', '2021-02-01')).success.id;
+      await EventCtrl.updateEventState(eventId);
+
+      await RunCtrl.createRunNGame(String(userId), '100%', 600, '1000', "PC", "Game1", "2000", []);
+      await RunCtrl.createRunNGame(String(userId), '100%', 600, '1000', "PC", "Game2", "2000", []);
+
+      const resp = JSON.stringify(await API.getUserRuns(String(userId)));
+
+      assert.equal(resp, JSON.stringify(
+        {
+          "status":200,
+          "msg":"listUserRuns",
+          "data":
+          [
+            [
+              {"event":"Evento","game":"Game1","category":"100%","platform":"PC","time_slot":"1000","waiting":0,"reviewed":0,"approved":0},
+              {"event":"Evento","game":"Game2","category":"100%","platform":"PC","time_slot":"1000","waiting":0,"reviewed":0,"approved":0}
+            ]
+          ]
+        }));
+    });
+    it('API.getUserRuns should return an error if a unexistent user is used', async function(){
+      const resp = JSON.stringify(await API.getUserRuns(''));
+      assert.equal(resp, JSON.stringify({"status":403,"msg":"Server error"}));
+    });
+  });
   describe('API.get', async function(){
     it('API.get should return an user', async function(){
       await API.create(
@@ -221,7 +292,7 @@ describe('UserAPI', async function(){
 
       const userId = (await userRepo.findOneOrFail({ 'first_name': 'Nome' })).id;
 
-      userPermissionCtrl.removePermission(String(userId), String(userId), "None");
+      await UserPermissionCtrl.removePermission(String(userId), String(userId), "None");
 
       const resp = JSON.stringify(await API.get(String(userId)));
 
@@ -267,7 +338,7 @@ describe('UserAPI', async function(){
       const user1 = await userRepo.findOneOrFail({ username: 'Usuario1' });
       const user2 = await userRepo.findOneOrFail({ username: 'Usuario2' });
 
-      await userPermissionCtrl.addPermission(String(user1.id), String(user1.id), 'Admin');
+      await UserPermissionCtrl.addPermission(String(user1.id), String(user1.id), 'Admin');
 
       const resp = JSON.stringify(await API.getUsers());
 

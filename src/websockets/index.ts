@@ -187,6 +187,7 @@ let loggedFunctionsAdmin = {
   deleteEventRun: eventRun.delete,
 
   */
+  createEventSchedule: eventSchedule.create,
   getEventSchedule: eventSchedule.getEventSchedule,
   updateEventSchedule: eventSchedule.updateEventSchedule,
   createSetupEventSchedule: eventSchedule.createSetupEventSchedule,

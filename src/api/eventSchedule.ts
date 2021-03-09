@@ -18,6 +18,16 @@ interface ISetup{
 }
 
 export default{
+  async create(order:string, type: string, event_run_id: string, event_extra_id: string, extra_time: string,  shouldGetRun?: boolean): Promise<APIResponse> {
+    let response = await Controller.create(order, type, event_run_id, event_extra_id, extra_time, shouldGetRun);
+    if (response.error) {
+      return {"status": 403, "msg": response.error};
+    }
+    //Successful request
+    return {"status": 200, "msg": "createEventSchedule", data:[response.success]};
+
+  },
+
   async getEventSchedule(): Promise<APIResponse> {
     let response = await Controller.getEventSchedule();
     if (response.error) {

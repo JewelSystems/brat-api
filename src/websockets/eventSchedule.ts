@@ -16,7 +16,20 @@ interface ISetup{
   order: number
 }
 
+interface INewSchedule{
+  order: string,
+  type: string,
+  event_run_id: string,
+  event_extra_id: string,
+  extra_time: string,
+  shouldGetRun: boolean
+}
+
 export default{
+  async create(packet: INewSchedule){
+    return await API.create(packet.order, packet.type, packet.event_run_id, packet.event_extra_id, packet.extra_time, packet.shouldGetRun);
+  },
+
   async getEventSchedule(){
     return await API.getEventSchedule();
   },

@@ -12,15 +12,27 @@ import runAPI from '../../api/run';
 import Game from '../../models/Game';
 import Event from '../../models/Event';
 import BidwarOption from '../../models/BidwarOption';
+import EventScheduleCtrl from '../../controller/eventSchedule';
+import SubmitRunCtrl from '../../controller/submitRun';
+import SubmitRun from '../../models/SubmitRun';
+import Run from '../../models/Run';
+import EventRun from '../../models/EventRun';
 
 let runIncentiveRepo: Repository<RunIncentive>;
 let userRepo: Repository<User>;
 let bidwarOptionRepo: Repository<BidwarOption>;
+let submitRunRepo: Repository<SubmitRun>;
+let runRepo: Repository<Run>;
+let eventRunRepo: Repository<EventRun>;
 
 let userId: string;
 let gameId: string;
 let incentiveId: string;
 let optionId: string;
+let eventRunId: string;
+let runId: string;
+let incentiveIds: string[] = [];
+let optionIds: string[] = [];
 
 interface IIncentive{
   id: string;
@@ -34,6 +46,10 @@ describe('RunIncentiveAPI', async function(){
   before(async function() {
     runIncentiveRepo = getRepository(RunIncentive);
     bidwarOptionRepo = getRepository(BidwarOption);
+    submitRunRepo = getRepository(SubmitRun);
+    userRepo = getRepository(User);
+    runRepo = getRepository(Run);
+    eventRunRepo = getRepository(EventRun);
   
     await getRepository(RunIncentive)
       .createQueryBuilder("runIncentive")
@@ -60,9 +76,52 @@ describe('RunIncentiveAPI', async function(){
         {"name": "option3"},
       ]},
     ]);
+    runId = String((await runRepo.find())[0].id);
 
     incentiveId = String((await runIncentiveRepo.findOneOrFail({ name: 'name1' })).id);
     optionId = String((await bidwarOptionRepo.findOneOrFail({ option: 'option1' })).id);
+    
+    const submitRunId = String((await submitRunRepo.find())[0].id);
+    
+    const incentives = await runIncentiveRepo.find();
+    for(let incentive of incentives){
+      incentiveIds.push(String(incentive.id));
+    }
+
+    const options = await bidwarOptionRepo.find();
+    for(let option of options){
+      optionIds.push(String(option.id));
+    }
+
+    const incentivesAux = 
+    [
+      {
+        id: incentiveIds[0],
+        run_id: runId,
+        type: "private",
+        comment: "comment1",
+        name: "name1",
+        options: 
+        [
+          {
+            id: optionIds[0],
+            name: "option1",
+          },
+          {
+            id: optionIds[1],
+            name: "option2",
+          },
+          {
+            id: optionIds[2],
+            name: "option3",
+          },
+        ],
+        goal: 0
+      }
+    ];
+
+    await SubmitRunCtrl.updateSubmitRunNRunIncentives(submitRunId, true, true, false, incentivesAux);
+    eventRunId = String((await eventRunRepo.findOne())?.id);
   });
 
   after(async function(){
@@ -135,6 +194,16 @@ describe('RunIncentiveAPI', async function(){
       const resp = JSON.stringify(await API.update(incentive));
       
       assert.equal(resp, JSON.stringify({"status":403,"msg":"Server error"}));
+    });
+  });
+  
+  describe.skip('API.getRunIncentives', async function(){
+    it('API.getRunIncentives should return the incentives of a run', async function(){
+      const eventScheduleId = (await EventScheduleCtrl.create("1", 'run', eventRunId, '', '0')).success.id;
+
+      const resp = JSON.stringify(await API.getRunIncentives(eventScheduleId));
+
+      assert.equal(resp, '');
     });
   });
 });

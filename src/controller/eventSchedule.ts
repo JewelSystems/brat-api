@@ -1,8 +1,11 @@
 import { getRepository } from 'typeorm';
 import logger from '../loaders/logger';
+import Event from '../models/Event';
 import EventExtra from '../models/EventExtra';
+import EventRun from '../models/EventRun';
 import EventSchedule from '../models/EventSchedule';
 import RunRunner from '../models/RunRunner';
+import SubmitRun from '../models/SubmitRun';
 
 interface CtrlResponse{
   success?: any;
@@ -20,6 +23,44 @@ interface ISetup{
 }
 
 export default{
+  async create(order:string, type: string, event_run_id: string, event_extra_id: string, extra_time: string, shouldGetRun?: boolean): Promise<CtrlResponse> {
+    logger.log("info", "Starting create event schedule function");
+    // Create event schedule
+    try{
+      if(!event_extra_id && !event_run_id) throw 'An id needs to be provided';
+
+      if(shouldGetRun){
+        const submitRun = await getRepository(SubmitRun).findOneOrFail({id: Number(event_run_id)});
+        event_run_id = String( (await getRepository(EventRun).findOneOrFail({ run_id: submitRun.run_id })).id );
+      }
+
+      const eventScheduleRepo = getRepository(EventSchedule);
+      const eventRepo = getRepository(Event);
+
+      const eventId = (await eventRepo.findOneOrFail({ active: 'A' })).id;
+
+      const schedule = eventScheduleRepo.create({
+        order: Number(order),
+        type: type,
+        event_id: eventId,
+        event_run_id: event_run_id? Number(event_run_id) : undefined,
+        event_extra_id: event_extra_id? Number(event_extra_id) : undefined,
+        extra_time: Number(extra_time),
+        active: false,
+        done: false,
+      });
+
+      await eventScheduleRepo.save(schedule);
+
+      return {success: schedule};
+    }catch(error){
+      console.log(error);
+      logger.log("error", "DB Error: " + JSON.stringify(error));
+      return {error: "Server error"};
+    }
+  },
+
+
   async getEventSchedule(): Promise<CtrlResponse> {
     logger.log("info", "Starting get event schedule function");
     // Get event schedule
