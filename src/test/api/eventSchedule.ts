@@ -141,20 +141,38 @@ describe('EventScheduleAPI', async function(){
           "data":
           [
             {
-              "order":1,
-              "type":"run",
-              "event_id":schedule.event_id,
-              "event_run_id":eventRunId,
-              "extra_time":0,
-              "active":false,
-              "done":false,
-              "event_extra_id":null,
-              "setup_time":null,
-              "final_time":null,
-              "id":Number(schedule.id)
+              "success":
+              [
+                {
+                  "id":String(schedule.id),
+                  "order":"1",
+                  "type":"run",
+                  "event_id":String(event.id),
+                  "event_run_id":String(eventRunId),
+                  "event_extra_id":null,
+                  "extra_time":"0",
+                  "setup_time":null,
+                  "active":0,
+                  "done":0,
+                  "final_time":null,
+                  "event_name":"Evento",
+                  "event_date":"2021-01-01T03:00:00.000Z",
+                  "game":"Jogo",
+                  "duration":"600",
+                  "category":"100%",
+                  "interval":"0001",
+                  "platform":"PC",
+                  "runner":"Nickname",
+                  "stream_link":"",
+                  "event_extra_time":null,
+                  "event_extra_type":null
+                }
+              ]
             }
-          ]
-        }));
+          ],
+          "type":"adminBroadcast"
+        }
+      ));
     });
     it('API.create should return a error if invalid data is used', async function(){
       const resp = JSON.stringify(await API.create('','','','',''));

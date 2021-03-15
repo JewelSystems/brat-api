@@ -45,7 +45,7 @@ describe('UserPemissionAPI', async function(){
     it('API.addPermission should add a permission to an user', async function(){
       const resp = JSON.stringify(await API.addPermission(userId, userId, 'admin'));
 
-      assert.equal(resp, JSON.stringify({"status":200,"msg":"addPermission","data":["OK"]}));
+      assert.equal(resp, JSON.stringify({"status":200,"msg":"addPermission","data":["admin"]}));
     });
     it('API.addPermission should return an error if the user do not exist', async function(){
       const resp = JSON.stringify(await API.addPermission('0', '0', 'admin'));
@@ -59,7 +59,7 @@ describe('UserPemissionAPI', async function(){
       await API.addPermission(userId, userId, 'admin');
       const resp = JSON.stringify(await API.removePermission(userId, userId, 'admin'));
       
-      assert.equal(resp, JSON.stringify({"status":200,"msg":"removePermission","data":["OK"]}));
+      assert.equal(resp, JSON.stringify({"status":200,"msg":"removePermission","data":["admin"]}));
     });
     it('API.removePermission should return an error if there is no connection', async function(){
       await getConnection().close();

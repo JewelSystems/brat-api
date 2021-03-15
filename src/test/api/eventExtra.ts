@@ -10,6 +10,7 @@ import EventController from '../../controller/event';
 let eventExtraRepo: Repository<EventExtra>;
 let event;
 let eventId: string;
+let eventName: string;
 
 describe('EventExtraAPI', async function(){
   before(async function() {
@@ -23,6 +24,7 @@ describe('EventExtraAPI', async function(){
     
     event = await EventController.create("Evento", "www.donationlink.com", "2021-01-01", "2021-01-10");
     eventId = event.success.id;
+    eventName = event.success.name;
     await EventController.updateEventState(eventId);
   });
 
@@ -48,7 +50,7 @@ describe('EventExtraAPI', async function(){
 
       const eventExtra = await eventExtraRepo.findOne({ type:"Entrevista" });
 
-      assert.equal(resp, JSON.stringify({"status":200,"msg":"createEventExtra","data":[{"event_id": String(eventId),"type":"Entrevista","time":600,"id": Number(eventExtra?.id) }],"type":"adminBroadcast"}));
+      assert.equal(resp, JSON.stringify({"status":200,"msg":"createEventExtra","data":[[{"id": String(eventExtra?.id),"name":eventName, "type":"Entrevista","time":"600"}]],"type":"adminBroadcast"}));
     });
     it('API.create should return an error if does not find an active Event', async function(){
       await getRepository(Event)
@@ -68,8 +70,8 @@ describe('EventExtraAPI', async function(){
   
   describe('API.getExtras', async function(){
     it('API.getExtras should return a list with the current EventExtras', async function(){
-      const extra1 = (await API.create('Entrevista', 600)).data[0];
-      const extra2 = (await API.create('Anuncio', 600)).data[0];
+      const extra1 = (await API.create('Entrevista', 600)).data[0][0];
+      const extra2 = (await API.create('Anuncio', 600)).data[0][1];
       const resp = JSON.stringify(await API.getExtras());
 
       assert.equal(resp, JSON.stringify({

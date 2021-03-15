@@ -197,13 +197,17 @@ describe('RunIncentiveAPI', async function(){
     });
   });
   
-  describe.skip('API.getRunIncentives', async function(){
+  describe('API.getRunIncentives', async function(){
     it('API.getRunIncentives should return the incentives of a run', async function(){
-      const eventScheduleId = (await EventScheduleCtrl.create("1", 'run', eventRunId, '', '0')).success.id;
-
+      const eventScheduleId = (await EventScheduleCtrl.create("1", 'run', eventRunId, '', '0')).success.success[0].id;
       const resp = JSON.stringify(await API.getRunIncentives(eventScheduleId));
 
-      assert.equal(resp, '');
+      assert.equal(resp, JSON.stringify({"status":200,"msg":"getRunIncentives","data":[[{"id":incentiveIds[0],"incentive":"nome","options":["opcao","option2","option3"]}]]}));
+    });
+    it('API.getRunIncentives should return an error if a unexistent event schedule id is used', async function(){
+      const resp = JSON.stringify(await API.getRunIncentives(''));
+
+      assert.equal(resp, JSON.stringify({"status":403,"msg":"Server error"}));
     });
   });
 });
