@@ -61,7 +61,6 @@ export default {
         }
       };
     }
-
     // Verify if user already exists
     if (await Controller.checkUsername(username)) {
       return {

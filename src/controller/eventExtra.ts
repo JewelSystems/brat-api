@@ -25,7 +25,7 @@ export default{
 
       await eventExtraRepository.save(eventExtra);
 
-      return {success: eventExtra};
+      return {success: (await this.getExtras()).success};
     }catch(error){
       logger.log("error", "DB Error: " + JSON.stringify(error));
       return {error: "Server error"};

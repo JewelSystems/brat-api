@@ -174,11 +174,11 @@ let loggedFunctionsAdmin = {
   updateEventState: event.updateEventState,
   /*
 
-  createEventExtra: eventExtra.create,
   getEventExtra: eventExtra.get,
   updateEventExtra: eventExtra.update,
   deleteEventExtra: eventExtra.delete,
   */
+  createEventExtra: eventExtra.create,
   getEventExtras: eventExtra.getExtras,
 
   /*

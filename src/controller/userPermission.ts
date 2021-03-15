@@ -18,7 +18,7 @@ export default{
       await entityManager.query(SQLQuery);
 
       userLog.log(Number(updatedUser), Number(updaterUser), "unset_permission_"+permission);
-      return {success: "OK"};
+      return {success: permission};
     }catch(error){
       logger.log("error", "DB Error: " + JSON.stringify(error));
       return {error: "Server error"};
@@ -34,7 +34,7 @@ export default{
       await entityManager.query(SQLQuery);
 
       userLog.log(Number(updatedUser), Number(updaterUser), "set_permission_"+permission);
-      return {success: "OK"};
+      return {success: permission};
     }catch(error){
       logger.log("error", "DB Error: " + JSON.stringify(error));
       return {error: "Server error"};

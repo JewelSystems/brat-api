@@ -11,7 +11,7 @@ export default {
     gender: Joi.string().min(1).max(1).required(),
     birthday: Joi.string().regex(/^\d{4}-\d{2}-\d{2}$/).required(),
     phone_number: Joi.string().max(17).required(),
-    stream_link: Joi.string().uri(),
+    stream_link: Joi.string().uri().required(),
     twitch: Joi.string().uri(),
     twitter: Joi.string().uri(),
     facebook: Joi.string().uri(),

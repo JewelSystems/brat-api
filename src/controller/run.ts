@@ -28,6 +28,10 @@ export default{
   async create(runnerId: string, gameId: string, category: string, estimatedTime: number, preferredTime: string, platform: string, incentives: IIncentive[]): Promise<CtrlResponse>{
     logger.log("info", "Starting create run function");
     try{
+      //Find active event
+      const eventRepository = getRepository(Event);
+      const activeEvent = await eventRepository.findOneOrFail({ active: 'A' });
+
       //Create Run
       const runRepository = getRepository(Run);
       
@@ -51,10 +55,6 @@ export default{
 
       await runRunnerRepository.save(runRunner);
       
-      //Find active event
-      const eventRepository = getRepository(Event);
-      const activeEvent = await eventRepository.findOneOrFail({ active: 'A' });
-
       //Create SubmitRun
       const submitRunRepository = getRepository(SubmitRun);
       
