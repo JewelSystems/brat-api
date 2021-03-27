@@ -200,7 +200,7 @@ export default{
             }
           }
         }else{
-          await eventRunRepository.delete(submitRun.run_id);
+          await eventRunRepository.delete({ run_id: submitRun.run_id });
         }
       }
 
@@ -286,7 +286,7 @@ export default{
             await eventRunIncentivesRepository.update(curIncentive[0].id, {
               "event_run_id": eventRunInfo.event_run.id,
               "incentive_id": Number(curIncentive[0].id),
-              "goal": Number(curIncentive[0].goal)
+              "goal": Number(curIncentive[0].goal) ? Number(curIncentive[0].goal) : 0
             });
           }else{
             //If the event run incentive wasn't found, create it.
@@ -294,7 +294,7 @@ export default{
               "event_run_id": Number(eventRunInfo.event_run.id),
               "incentive_id": Number(curIncentive[0].id),
               "cur_value": 0,
-              "goal": Number(curIncentive[0].goal),
+              "goal": Number(curIncentive[0].goal) ? Number(curIncentive[0].goal) : 0
             });
             await eventRunIncentivesRepository.save(eventRunIncentive);
 
@@ -328,6 +328,7 @@ export default{
         approved_incentives: approvedIncentives,
         goals: goals
       };
+      
       return {success: resp};
     }catch(error){
       logger.log("error", "DB Error: " + JSON.stringify(error));

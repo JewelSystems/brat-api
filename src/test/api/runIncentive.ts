@@ -207,7 +207,6 @@ describe('RunIncentiveAPI', async function(){
     it('API.getRunIncentives should return an error if a unexistent event schedule id is used', async function(){
       const resp = JSON.stringify(await API.getRunIncentives(''));
 
-      console.log('aa');
       assert.equal(resp, JSON.stringify({"status":403,"msg":"Server error"}));
     });
   });

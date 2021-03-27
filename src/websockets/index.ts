@@ -14,17 +14,15 @@ import runIncentive from './runIncentive';
 import donation from './donation';
 import eventRun from './eventRun';
 
-/*
-interface IConnection{
+interface IConnection extends ws{
   functions: any,
   id: number,
-  reqId: null | number,
-  authToken: null | number,
+  reqId?: number,
+  authToken?: number,
   authenticated: boolean,
-  permissions: null | string[],
-  user: null | string
+  permissions?: string[],
+  user?: string
 }
-*/
 
 interface IMsg{
   endpoint: string;
@@ -37,17 +35,17 @@ const websocket = (server: Server) => {
   let adminUsers: Record<string, any> = {};
   const wss = new ws.Server({ server });
 
-  wss.on('connection', function connection(ws: any) {
+  wss.on('connection', function connection(ws: IConnection) {
     console.log('New client connection');
     ws.functions = unloggedFunctions;
     ws.id = counter++;
-    ws.reqId = null;
+    ws.reqId;
     
-    ws.authToken = null;
+    ws.authToken;
     ws.authenticated = false;
 
-    ws.permissions = null;
-    ws.user = null;
+    ws.permissions;
+    ws.user;
 
     ws.on('message', async function incoming(message: string) {
       console.log("Received: ", message);
@@ -85,7 +83,7 @@ const websocket = (server: Server) => {
 
             packet = {"endpoint": endpoint, "id":id, "info":{"status": packet.status, "msg": "authLogin"}};
 
-            if(ws.permissions.includes('Admin')){
+            if(ws.permissions != null && ws.permissions.includes('Admin')){
               console.log("ADMIN");
               adminUsers[ws.id] = ws;
               ws.functions = loggedFunctionsAdmin;
