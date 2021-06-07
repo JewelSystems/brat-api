@@ -6,6 +6,7 @@ import userLog from '../controller/userLog';
 import { getManager, getRepository } from 'typeorm';
 import Permission from '../models/Permission';
 
+import {UserRepo, UserPermissionRepo} from '../loaders/typeorm';
 
 interface CtrlResponse{
   success?: any;
@@ -16,9 +17,7 @@ export default {
   async checkUsername(username: string): Promise<User | undefined | never>{
     logger.log("info", "Starting check username function");
     try{
-      const userRepository = getRepository(User);
-
-      const user = await userRepository.findOne({
+      const user = await UserRepo.findOne({
         where: { username }
       });
       return user;
@@ -31,9 +30,7 @@ export default {
   async checkId(id: string): Promise<User | undefined | never>{
     logger.log("info", "Starting check id function");
     try{
-      const userRepository = getRepository(User);
-
-      const user = await userRepository.findOne({
+      const user = await UserRepo.findOne({
         where: { id }
       });
       return user;
@@ -62,9 +59,7 @@ export default {
     logger.log("info", "Starting user create function");
     try{
       //Create User
-      const userRepository = getRepository(User);
-
-      const user: User = userRepository.create({
+      const user: User = UserRepo.create({
         first_name: firstName,
         last_name: lastName,
         username,
@@ -86,17 +81,15 @@ export default {
         updated: 0
       });
       
-      await userRepository.save(user);
+      await UserRepo.save(user);
 
       //Create UserPermission
-      const userPermissionRepository = getRepository(UserPermission);
-
-      const userPermission: UserPermission = userPermissionRepository.create({
+      const userPermission: UserPermission = UserPermissionRepo.create({
         user_id: user.id,
         permission_id: 8,
       });
 
-      await userPermissionRepository.save(userPermission);
+      await UserPermissionRepo.save(userPermission);
 
       //Create Log
       userLog.log(user.id, user.id, "user_create");
@@ -114,9 +107,7 @@ export default {
       //const entityManager = getManager();
       //const user = await entityManager.query('SELECT users.id, users.first_name, users.last_name, users.username, users.email, users.gender, users.phone_number, users.stream_link, users.twitch, users.twitter, users.facebook, users.instagram, users.youtube, GROUP_CONCAT(permissions.permission) as `permissions` FROM users, user_permissions, permissions WHERE users.id = ' +id+ ' AND users.id = user_permissions.user_id AND user_permissions.permission_id = permissions.id GROUP BY users.id');
       //console.log(user);
-
-      const userRepo = getRepository(User);
-      const userTemp = await userRepo
+      const userTemp = await UserRepo
         .createQueryBuilder("user")
         .leftJoinAndSelect(UserPermission, "user_permissions", `user_permissions.user_id = '${id}'`)
         .leftJoinAndSelect(Permission, "permissions", `permissions.id = user_permissions.permission_id`)
@@ -175,9 +166,7 @@ export default {
   },
 
   async login(username: string, password: string): Promise<boolean> {
-    const userRepository = getRepository(User);
-
-    const userFound= await userRepository.findOne({
+    const userFound= await UserRepo.findOne({
       where: { username }
     });
     

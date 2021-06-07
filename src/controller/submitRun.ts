@@ -1,4 +1,3 @@
-import { getRepository } from 'typeorm';
 import logger from '../loaders/logger';
 import BidwarOption from '../models/BidwarOption';
 import EventRun from '../models/EventRun';
@@ -7,6 +6,7 @@ import EventRunBidwarOption from '../models/EventRunBidwarOption';
 import RunIncentive from '../models/RunIncentive';
 import RunRunner from '../models/RunRunner';
 import SubmitRun from '../models/SubmitRun';
+import {SubmitRunRepo, EventRunIncentiveRepo, EventRunRepo, EventRunBidwarOptionRepo, RunIncentiveRepo} from '../loaders/typeorm';
 
 interface CtrlResponse{
   success?: any;
@@ -67,11 +67,7 @@ export default{
   async getSubmitRuns(): Promise<CtrlResponse> {
     logger.log("info", "Starting get submit runs function");
     try{
-
-      const submitRunsRepository = getRepository(SubmitRun);
-      const eventRunIncentivesRepository = getRepository(EventRunIncentive);
-
-      const submitRuns = await submitRunsRepository
+      const submitRuns = await SubmitRunRepo
         .createQueryBuilder("submit_runs")
         .leftJoinAndSelect("submit_runs.event_id", "event")
         .leftJoinAndSelect("submit_runs.run_id", "run")
@@ -134,7 +130,7 @@ export default{
 
           if(submitRun.reviewed && resp[respIdx].incentives.length > 0){
             const incentiveIdx = resp[respIdx].incentives.length-1;
-            const incentiveFound = await eventRunIncentivesRepository.findOne({ incentive_id: Number(resp[respIdx].incentives[incentiveIdx].id) });
+            const incentiveFound = await EventRunIncentiveRepo.findOne({ incentive_id: Number(resp[respIdx].incentives[incentiveIdx].id) });
             if(incentiveFound){
               resp[respIdx].approved_incentives[submitRun.run_incentives_id] = 'true';
               if(incentiveFound.goal !== 0) resp[respIdx].goals[resp[respIdx].incentives[incentiveIdx].id] = incentiveFound.goal;
@@ -164,11 +160,8 @@ export default{
   async update(id: string, reviewed: boolean, approved: boolean, waiting: boolean): Promise<CtrlResponse> {
     logger.log("info", "Starting submit run update function");
     // Update submit run
-    try{
-      const submitRunRepository = getRepository(SubmitRun);
-      const eventRunRepository = getRepository(EventRun);
-      
-      await submitRunRepository.update(id,{
+    try{      
+      await SubmitRunRepo.update(id,{
         reviewed: reviewed,
         approved: approved,
         waiting: waiting
@@ -181,26 +174,26 @@ export default{
         waiting: waiting,
       };
 
-      const submitRun = await submitRunRepository.findOne({ id: Number(id) });
+      const submitRun = await SubmitRunRepo.findOne({ id: Number(id) });
       //Create or remove evaluated submitted runs from event_runs table.
       let newEvtRun = null;
       let evtRun = null;
 
       if(submitRun){
         if(approved){
-          evtRun = await eventRunRepository.findOne({ run_id: submitRun.run_id });
+          evtRun = await EventRunRepo.findOne({ run_id: submitRun.run_id });
           
           if(!evtRun){
             if(waiting){
-              newEvtRun = eventRunRepository.create({event_id: submitRun.event_id, run_id: submitRun.run_id, date: '01-01-2021'});
-              await eventRunRepository.save(newEvtRun);
+              newEvtRun = EventRunRepo.create({event_id: submitRun.event_id, run_id: submitRun.run_id, date: '01-01-2021'});
+              await EventRunRepo.save(newEvtRun);
             }else{
-              newEvtRun = eventRunRepository.create({event_id: submitRun.event_id, run_id: submitRun.run_id, date: '01-01-2021'});
-              await eventRunRepository.save(newEvtRun);
+              newEvtRun = EventRunRepo.create({event_id: submitRun.event_id, run_id: submitRun.run_id, date: '01-01-2021'});
+              await EventRunRepo.save(newEvtRun);
             }
           }
         }else{
-          await eventRunRepository.delete({ run_id: submitRun.run_id });
+          await EventRunRepo.delete({ run_id: submitRun.run_id });
         }
       }
 
@@ -217,19 +210,14 @@ export default{
   async refuseSubmitRunNRemoveIncentives(id: string, reviewed: boolean, approved: boolean, waiting: boolean): Promise<CtrlResponse> {
     logger.log("info", "Starting submit run with incentives refuse function");
     // Remove submit run with incentives
-    try{
-      const submitRunRepository = getRepository(SubmitRun);
-      const eventRunRepository = getRepository(EventRun);
-      const eventRunIncentivesRepository = getRepository(EventRunIncentive);
-      const EventRunBidwarOptionsRepository = getRepository(EventRunBidwarOption);
-      
-      await submitRunRepository.update(id,{
+    try{      
+      await SubmitRunRepo.update(id,{
         reviewed: reviewed,
         approved: approved,
         waiting: waiting
       });
       
-      const submitRun = await submitRunRepository.findOne({ id: Number(id) });
+      const submitRun = await SubmitRunRepo.findOne({ id: Number(id) });
         
       const resp = {
         id: id,
@@ -240,17 +228,17 @@ export default{
 
       if(submitRun){
         //TODO atualizar array de approve quando remover
-        const eventRun = await eventRunRepository.findOne({ run_id: submitRun.run_id });
+        const eventRun = await EventRunRepo.findOne({ run_id: submitRun.run_id });
         if(eventRun){
-          const incentives = await eventRunIncentivesRepository.find({ where:{ event_run_id: eventRun.id } });
+          const incentives = await EventRunIncentiveRepo.find({ where:{ event_run_id: eventRun.id } });
           for(let incentive of incentives){
-            const options = await EventRunBidwarOptionsRepository.find({ where:{ event_run_incentive_id: incentive.id } });
+            const options = await EventRunBidwarOptionRepo.find({ where:{ event_run_incentive_id: incentive.id } });
             for(let option of options){
-              EventRunBidwarOptionsRepository.delete(option.id);
+              EventRunBidwarOptionRepo.delete(option.id);
             }
-            eventRunIncentivesRepository.delete(incentive.id);
+            EventRunIncentiveRepo.delete(incentive.id);
           }
-          eventRunRepository.delete(eventRun.id);
+          EventRunRepo.delete(eventRun.id);
         }
       }
       
@@ -265,47 +253,47 @@ export default{
     logger.log("info", "Starting submit run with incentives update function");
     // Update submit run
     try{
-      const runIncentivesRepository = getRepository(RunIncentive);
-      const eventRunIncentivesRepository = getRepository(EventRunIncentive);
-      const eventRunBidwarOptionRepository = getRepository(EventRunBidwarOption);
+      //const runIncentivesRepository = getRepository(RunIncentive);
+      //const eventRunIncentivesRepository = getRepository(EventRunIncentive);
+      //const eventRunBidwarOptionRepository = getRepository(EventRunBidwarOption);
 
       let eventRunId = await this.update(id, reviewed, approved, waiting);
       const eventRunInfo = eventRunId.success;
       let approvedIncentives: any = {};
       let goals: any = {};
 
-      const allIncentives = await runIncentivesRepository.find({ where:{run_id: eventRunInfo.event_run.run_id} });
+      const allIncentives = await RunIncentiveRepo.find({ where:{run_id: eventRunInfo.event_run.run_id} });
 
       for(let incentive of allIncentives){
         const curIncentive = incentives.filter((element: IIncentive) => Number(element.id) === Number(incentive.id));
-        const eventRunIncentiveFound = await eventRunIncentivesRepository.findOne({ where:{incentive_id: incentive.id} });
+        const eventRunIncentiveFound = await EventRunIncentiveRepo.findOne({ where:{incentive_id: incentive.id} });
         
         if(curIncentive.length > 0){
           if(eventRunIncentiveFound){
             //If the event run incentive was found, update it's values.
-            await eventRunIncentivesRepository.update(curIncentive[0].id, {
+            await EventRunIncentiveRepo.update(curIncentive[0].id, {
               "event_run_id": eventRunInfo.event_run.id,
               "incentive_id": Number(curIncentive[0].id),
               "goal": Number(curIncentive[0].goal) ? Number(curIncentive[0].goal) : 0
             });
           }else{
             //If the event run incentive wasn't found, create it.
-            const eventRunIncentive = eventRunIncentivesRepository.create({
+            const eventRunIncentive = EventRunIncentiveRepo.create({
               "event_run_id": Number(eventRunInfo.event_run.id),
               "incentive_id": Number(curIncentive[0].id),
               "cur_value": 0,
               "goal": Number(curIncentive[0].goal) ? Number(curIncentive[0].goal) : 0
             });
-            await eventRunIncentivesRepository.save(eventRunIncentive);
+            await EventRunIncentiveRepo.save(eventRunIncentive);
 
             if(curIncentive[0].options && curIncentive[0].options.length > 0){
               for(let option of curIncentive[0].options){
-                const eventRunBidwarOption = eventRunBidwarOptionRepository.create({
+                const eventRunBidwarOption = EventRunBidwarOptionRepo.create({
                   "event_run_incentive_id": Number(eventRunIncentive.id),
                   "bidwar_option_id": Number(option.id),
                   "cur_value": 0
                 });
-                await eventRunBidwarOptionRepository.save(eventRunBidwarOption);
+                await EventRunBidwarOptionRepo.save(eventRunBidwarOption);
               }
             }
           }
@@ -313,8 +301,8 @@ export default{
           if(curIncentive[0].goal !== 0) goals[incentive.id] = curIncentive[0].goal;
         }else{
           if(eventRunIncentiveFound){
-            await eventRunBidwarOptionRepository.delete({ event_run_incentive_id: eventRunIncentiveFound.id });
-            await eventRunIncentivesRepository.delete({ incentive_id: incentive.id });
+            await EventRunBidwarOptionRepo.delete({ event_run_incentive_id: eventRunIncentiveFound.id });
+            await EventRunIncentiveRepo.delete({ incentive_id: incentive.id });
           }
           approvedIncentives[incentive.id] = false;
         }

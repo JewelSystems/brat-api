@@ -3,6 +3,8 @@ import { getRepository } from 'typeorm';
 import EventExtra from '../models/EventExtra';
 import Event from '../models/Event';
 
+import {EventExtraRepo, EventRepo} from '../loaders/typeorm';
+
 interface CtrlResponse{
   success?: any;
   error?: string;
@@ -11,19 +13,16 @@ interface CtrlResponse{
 export default{
   async create( type: string, time: number): Promise<CtrlResponse>{
     logger.log("info", "Starting game create function");
-    try{
-      const eventExtraRepository = getRepository(EventExtra);
-      const eventRepository = getRepository(Event);
-      
-      const event = await eventRepository.findOneOrFail({ active: "A" });
+    try{      
+      const event = await EventRepo.findOneOrFail({ active: "A" });
 
-      const eventExtra = eventExtraRepository.create({
+      const eventExtra = EventExtraRepo.create({
         event_id: event?.id,
         type,
         time
       });
 
-      await eventExtraRepository.save(eventExtra);
+      await EventExtraRepo.save(eventExtra);
 
       return {success: (await this.getExtras()).success};
     }catch(error){
@@ -34,10 +33,8 @@ export default{
 
   async getExtras(): Promise<CtrlResponse>{
     logger.log("info", "Starting get all event extras function");
-    try{
-      const eventExtraRepo = getRepository(EventExtra);
-      
-      const eventExtras = await eventExtraRepo
+    try{      
+      const eventExtras = await EventExtraRepo
         .createQueryBuilder("event_extra")
         .leftJoinAndSelect("event_extra.event_id", "event")
         .select([

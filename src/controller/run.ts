@@ -1,5 +1,4 @@
 import logger from '../loaders/logger';
-import { getRepository } from 'typeorm';
 import Run from '../models/Run';
 import RunRunner from '../models/RunRunner';
 import SubmitRun from '../models/SubmitRun';
@@ -7,6 +6,8 @@ import RunIncentive from '../models/RunIncentive';
 import BidwarOption from '../models/BidwarOption';
 import Game from '../models/Game';
 import Event from '../models/Event';
+
+import {EventRepo, RunRepo, RunRunnerRepo, SubmitRunRepo, RunIncentiveRepo, BidwarOptionRepo, GameRepo} from '../loaders/typeorm';
 
 interface CtrlResponse{
   success?: any;
@@ -29,13 +30,10 @@ export default{
     logger.log("info", "Starting create run function");
     try{
       //Find active event
-      const eventRepository = getRepository(Event);
-      const activeEvent = await eventRepository.findOneOrFail({ active: 'A' });
+      const activeEvent = await EventRepo.findOneOrFail({ active: 'A' });
 
-      //Create Run
-      const runRepository = getRepository(Run);
-      
-      const run: Run = runRepository.create({
+      //Create Run      
+      const run: Run = RunRepo.create({
         game_id: Number(gameId),
         category: category,
         estimated_time: estimatedTime,
@@ -43,22 +41,18 @@ export default{
         platform: platform
       });
 
-      await runRepository.save(run);
+      await RunRepo.save(run);
       
       //Create RunRunner
-      const runRunnerRepository = getRepository(RunRunner);
-
-      const runRunner: RunRunner = runRunnerRepository.create({
+      const runRunner: RunRunner = RunRunnerRepo.create({
         runner_id: Number(runnerId),
         run_id: run.id
       });
 
-      await runRunnerRepository.save(runRunner);
+      await RunRunnerRepo.save(runRunner);
       
-      //Create SubmitRun
-      const submitRunRepository = getRepository(SubmitRun);
-      
-      const submitRun: SubmitRun = submitRunRepository.create({
+      //Create SubmitRun      
+      const submitRun: SubmitRun = SubmitRunRepo.create({
         event_id: activeEvent.id,
         run_id: run.id,
         reviewed: false,
@@ -66,19 +60,16 @@ export default{
         waiting: false
       });
 
-      await submitRunRepository.save(submitRun);
+      await SubmitRunRepo.save(submitRun);
 
       //Create Incentives and Bidwar Options
       
-      const runIncentiveRepository = getRepository(RunIncentive);
-      const bidwarOptionRepository = getRepository(BidwarOption);
-
       let runIncentives: RunIncentive[] = [];
       let bidwarOptions: BidwarOption[] = [];
 
       for(let incentive of incentives){
         runIncentives.push(
-          runIncentiveRepository.create({
+          RunIncentiveRepo.create({
             run_id: run.id,
             type: incentive.type,
             comment: incentive.comment,
@@ -86,10 +77,10 @@ export default{
           })
         );
         if(incentive.type === 'private'){
-          await runIncentiveRepository.save(runIncentives);
+          await RunIncentiveRepo.save(runIncentives);
           for(let option of incentive.options){
             bidwarOptions.push(
-              bidwarOptionRepository.create({
+              BidwarOptionRepo.create({
                 incentive_id: runIncentives[runIncentives.length-1].id,
                 option: option.name,
               })
@@ -99,8 +90,8 @@ export default{
         }
       }
 
-      if(runIncentives) await runIncentiveRepository.save(runIncentives);
-      await bidwarOptionRepository.save(bidwarOptions);
+      if(runIncentives) await RunIncentiveRepo.save(runIncentives);
+      await BidwarOptionRepo.save(bidwarOptions);
 
       return { success: "Creation success" };
     }catch(error){
@@ -112,14 +103,12 @@ export default{
   async createRunNGame(runnerId: string, category: string, estimatedTime: number, preferredTime: string, platform: string, name: string, year: string, incentives: IIncentive[]): Promise<CtrlResponse>{
     logger.log("info", "Starting create run and game function");
     try{
-      const gameRepository = getRepository(Game);
-
-      const game: Game = gameRepository.create({
+      const game: Game = GameRepo.create({
         name,
         year
       });
 
-      await gameRepository.save(game);
+      await GameRepo.save(game);
 
       await  this.create(runnerId, String(game.id), category, estimatedTime, preferredTime, platform, incentives);
     

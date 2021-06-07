@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import userController from '../controller/user';
 import redis from '../loaders/redis';
 import { getManager } from 'typeorm';
+import { connection } from '../loaders/typeorm';
 
 interface CtrlResponse{
   success?: any;

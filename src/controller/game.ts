@@ -1,6 +1,7 @@
 import logger from '../loaders/logger';
-import { getRepository } from 'typeorm';
 import Game from '../models/Game';
+
+import {GameRepo} from '../loaders/typeorm';
 
 interface CtrlResponse{
   success?: any;
@@ -11,9 +12,7 @@ export default{
   async getGames(): Promise<CtrlResponse>{
     logger.log("info", "Starting get all games function");
     try{
-      const gamesRepository = getRepository(Game);
-
-      const games = await gamesRepository.find();
+      const games = await GameRepo.find();
       return { success: games };
     }catch(error){
       logger.log("error", "DB Error: " + JSON.stringify(error));
@@ -25,9 +24,7 @@ export default{
     logger.log("info", "Starting game update function");
     // Update game
     try{
-      const gamesRepository = getRepository(Game);
-
-      await gamesRepository.update(Number(id), {
+      await GameRepo.update(Number(id), {
         name,
         year
       });
@@ -42,14 +39,12 @@ export default{
   async create( name: string, year: string): Promise<CtrlResponse>{
     logger.log("info", "Starting game create function");
     try{
-      const gameRepository = getRepository(Game);
-
-      const game = gameRepository.create({
+      const game = GameRepo.create({
         name: name,
         year: year
       });
 
-      await gameRepository.save(game);
+      await GameRepo.save(game);
 
       return {success: game};
     }catch(error){

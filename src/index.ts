@@ -11,38 +11,41 @@ import "reflect-metadata";
 import websocket from './websockets';
 import routes from './routes';
 import logger from './loaders/logger';
+import {initializeModels} from './loaders/typeorm';
 import { createConnection } from 'typeorm';
 
-const app: Application = express();
-const port = process.env.SV_PORT || 3000;
+(async function(){
+  await initializeModels();
 
-// Middlewares 
-// Parse application/x-www-form-urlencoded
-app.use(bp.urlencoded({ extended: false }));
+  const app: Application = express();
+  const port = process.env.SV_PORT || 3000;
 
-// Parse application/json
-app.use(bp.json());
+  // Middlewares 
+  // Parse application/x-www-form-urlencoded
+  app.use(bp.urlencoded({ extended: false }));
 
-// Helmet
-app.use(helmet());
+  // Parse application/json
+  app.use(bp.json());
 
-// Cors
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+  // Helmet
+  app.use(helmet());
 
-routes(app);
+  // Cors
+  app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  }));
 
-// Server
-let server = http.createServer(app);
+  routes(app);
 
-// Websocket
-websocket(server);
+  // Server
+  let server = http.createServer(app);
 
-createConnection();
+  // Websocket
+  websocket(server);
 
-server.listen(port, () => {
-  logger.log("info", `BrAT listening at ${(process.env.SV_ADDRESS || 'http://localhost:') + port}`);
-});
+  server.listen(port, () => {
+    logger.log("info", `BrAT listening at ${(process.env.SV_ADDRESS || 'http://localhost:') + port}`);
+  });
+})();

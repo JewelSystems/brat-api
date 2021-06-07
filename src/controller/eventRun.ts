@@ -7,6 +7,8 @@ import EventSchedule from '../models/EventSchedule';
 import RunRunner from '../models/RunRunner';
 import SubmitRun from '../models/SubmitRun';
 
+import {EventRunRepo} from '../loaders/typeorm';
+
 interface CtrlResponse{
   success?: any;
   error?: string;
@@ -28,9 +30,7 @@ export default{
     logger.log("info", "Starting get event runs function");
     // Get event runs
     try{
-      const eventRunsRepo = getRepository(EventRun);
-
-      const eventRuns = await eventRunsRepo
+      const eventRuns = await EventRunRepo
         .createQueryBuilder("event_run")
         .leftJoinAndSelect(Event, "event", "event.active = 'A' and event.id = event_run.event_id")
         .leftJoinAndSelect(SubmitRun, "submit_run", "submit_run.run_id = event_run.run_id")

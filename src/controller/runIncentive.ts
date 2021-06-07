@@ -1,9 +1,10 @@
 import RunIncentive from '../models/RunIncentive';
 import logger from '../loaders/logger';
-import { getRepository } from 'typeorm';
 import BidwarOption from '../models/BidwarOption';
 import EventSchedule from '../models/EventSchedule';
 import EventRunIncentive from '../models/EventRunIncentive';
+
+import {BidwarOptionRepo, RunIncentiveRepo, EventScheduleRepo} from '../loaders/typeorm';
 
 interface CtrlResponse{
   success?: any;
@@ -23,20 +24,17 @@ export default{
     logger.log("info", "Starting incentive update function");
     // Update incentive
     try{
-      const bidwarOptionRepository = getRepository(BidwarOption);
-      const runIncentiveRepository = getRepository(RunIncentive);
-
-      await runIncentiveRepository.findOneOrFail(incentive.id);
+      await RunIncentiveRepo.findOneOrFail(incentive.id);
       
       if(!incentive.goal){
         for(let option of incentive.bidwar_options){
-          bidwarOptionRepository.update(option.id, {
+          BidwarOptionRepo.update(option.id, {
             option: option.option,
           });
         }
       }
             
-      runIncentiveRepository.update(incentive.id, {
+      RunIncentiveRepo.update(incentive.id, {
         name: incentive.name,
         comment: incentive.comment
       });
@@ -53,9 +51,7 @@ export default{
     logger.log("info", "Starting incentive run get function");
     // get run incentives
     try{
-      const eventScheduleRepository = getRepository(EventSchedule);
-
-      const runIncentives = await eventScheduleRepository
+      const runIncentives = await EventScheduleRepo
         .createQueryBuilder("event_schedule")
         .leftJoinAndSelect(EventRunIncentive, "event_run_incentive", "event_run_incentive.event_run_id = event_schedule.event_run_id")
         .leftJoinAndSelect(RunIncentive, "run_incentive", "run_incentive.id = event_run_incentive.incentive_id")

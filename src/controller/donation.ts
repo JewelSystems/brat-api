@@ -5,6 +5,8 @@ import EventRunIncentive from '../models/EventRunIncentive';
 import EventRunBidwarOption from '../models/EventRunBidwarOption';
 import BidwarOption from '../models/BidwarOption';
 
+import {EventRunIncentiveRepo, EventRunBidwarOptionRepo, DonationRepo} from '../loaders/typeorm';
+
 interface CtrlResponse{
   success?: any;
   error?: string;
@@ -15,18 +17,14 @@ export default{
     logger.log("info", "Starting donation create and update function");
     // Update game
     try{
-      const donationRepository = getRepository(Donation);
-      const eventRunIncentiveRepository = getRepository(EventRunIncentive);
-      const bidwarOptionRepository = getRepository(EventRunBidwarOption);
-
       let eventRunIncentive: EventRunIncentive | undefined;
       let eventRunOption: EventRunBidwarOption | undefined;
       let donation: Donation;
 
-      eventRunIncentive = await eventRunIncentiveRepository.findOneOrFail({ incentive_id: Number(incentive_id) });
+      eventRunIncentive = await EventRunIncentiveRepo.findOneOrFail({ incentive_id: Number(incentive_id) });
       if(eventRunIncentive){
         if(option_name){
-          eventRunOption = await bidwarOptionRepository
+          eventRunOption = await EventRunBidwarOptionRepo
             .createQueryBuilder("event_run_bidwar_option")
             .leftJoinAndSelect(BidwarOption, "bidwar_option", `bidwar_option.option = '${option_name}' and bidwar_option.incentive_id = ${incentive_id}`)
             .where(`event_run_incentive_id = ${eventRunIncentive.id} and bidwar_option_id = bidwar_option.id`)
@@ -40,7 +38,7 @@ export default{
             )
             .getRawOne();
             
-          donation = donationRepository.create({
+          donation = DonationRepo.create({
             first_name: first_name,
             last_name: last_name,
             email: email,
@@ -49,7 +47,7 @@ export default{
             option_id: Number(eventRunOption?.id)
           });
         }else{
-          donation = donationRepository.create({
+          donation = DonationRepo.create({
             first_name: first_name,
             last_name: last_name,
             email: email,
@@ -58,12 +56,12 @@ export default{
           });
         }
 
-        donationRepository.save(donation);
+        DonationRepo.save(donation);
         
         if(eventRunOption){
-          bidwarOptionRepository.update(eventRunOption.id, { cur_value: (eventRunOption?.cur_value + Number(value)) });
+          EventRunBidwarOptionRepo.update(eventRunOption.id, { cur_value: (eventRunOption?.cur_value + Number(value)) });
         }else{
-          eventRunIncentiveRepository.update(eventRunIncentive.id, { cur_value: (eventRunIncentive?.cur_value + Number(value)) });
+          EventRunIncentiveRepo.update(eventRunIncentive.id, { cur_value: (eventRunIncentive?.cur_value + Number(value)) });
         }
 
       }

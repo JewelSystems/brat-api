@@ -1,4 +1,3 @@
-import { getRepository } from 'typeorm';
 import logger from '../loaders/logger';
 import Event from '../models/Event';
 import EventExtra from '../models/EventExtra';
@@ -6,6 +5,8 @@ import EventRun from '../models/EventRun';
 import EventSchedule from '../models/EventSchedule';
 import RunRunner from '../models/RunRunner';
 import SubmitRun from '../models/SubmitRun';
+
+import {SubmitRunRepo, EventScheduleRepo, EventRunRepo, EventRepo} from '../loaders/typeorm';
 
 interface CtrlResponse{
   success?: any;
@@ -30,16 +31,13 @@ export default{
       if(!event_extra_id && !event_run_id) throw 'An id needs to be provided';
 
       if(shouldGetRun){
-        const submitRun = await getRepository(SubmitRun).findOneOrFail({id: Number(event_run_id)});
-        event_run_id = String( (await getRepository(EventRun).findOneOrFail({ run_id: submitRun.run_id })).id );
+        const submitRun = await SubmitRunRepo.findOneOrFail({id: Number(event_run_id)});
+        event_run_id = String( (await EventRunRepo.findOneOrFail({ run_id: submitRun.run_id })).id );
       }
 
-      const eventScheduleRepo = getRepository(EventSchedule);
-      const eventRepo = getRepository(Event);
+      const eventId = (await EventRepo.findOneOrFail({ active: 'A' })).id;
 
-      const eventId = (await eventRepo.findOneOrFail({ active: 'A' })).id;
-
-      const schedule = eventScheduleRepo.create({
+      const schedule = EventScheduleRepo.create({
         order: Number(order),
         type: type,
         event_id: eventId,
@@ -50,7 +48,7 @@ export default{
         done: false,
       });
 
-      await eventScheduleRepo.save(schedule);
+      await EventScheduleRepo.save(schedule);
       
       const resp = await this.getEventSchedule();
       return {success: resp};
@@ -65,9 +63,7 @@ export default{
     logger.log("info", "Starting get event schedule function");
     // Get event schedule
     try{
-      const eventScheduleRepository = getRepository(EventSchedule);
-
-      const eventSchedule = await eventScheduleRepository
+      const eventSchedule = await EventScheduleRepo
         .createQueryBuilder("event_schedule")
         .orderBy('event_schedule.order', 'ASC')
         .leftJoinAndSelect("event_schedule.event_id", "event")
@@ -128,10 +124,8 @@ export default{
     try{
       const dataJSON = JSON.parse(data);
 
-      const eventScheduleRepository = getRepository(EventSchedule);
-
       for(let row of dataJSON){
-        await eventScheduleRepository.update(Number(row.id), { "order": row.order});
+        await EventScheduleRepo.update(Number(row.id), { "order": row.order});
       }
 
       const resp = await this.getEventSchedule();
@@ -148,9 +142,8 @@ export default{
     try{
       const dataJSON = JSON.parse(data);
 
-      const eventScheduleRepository = getRepository(EventSchedule);
       for(let setup of setups){
-        const newSetup = eventScheduleRepository.create({
+        const newSetup = EventScheduleRepo.create({
           "order": setup.order,
           "type": setup.type,
           "event_id": Number(setup.event_id),
@@ -158,7 +151,7 @@ export default{
           "active": false,
           "done": false,
         });
-        await eventScheduleRepository.save(newSetup);
+        await EventScheduleRepo.save(newSetup);
         
         dataJSON.find((element: ISetup) => element.order === newSetup.order).id = newSetup.id;
       }
@@ -177,8 +170,7 @@ export default{
     logger.log("info", "Starting delete event schedule function");
     // delete event schedule
     try{
-      const eventScheduleRepository = getRepository(EventSchedule);
-      await eventScheduleRepository.delete(id);
+      await EventScheduleRepo.delete(id);
 
       const resp = await this.getEventSchedule();
       return {success: resp};
