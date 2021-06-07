@@ -12,7 +12,6 @@ import websocket from './websockets';
 import routes from './routes';
 import logger from './loaders/logger';
 import {initializeModels} from './loaders/typeorm';
-import { createConnection } from 'typeorm';
 
 (async function(){
   await initializeModels();
