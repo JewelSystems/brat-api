@@ -3,7 +3,7 @@ import logger from '../loaders/logger';
 import User from '../models/User';
 import UserPermission from '../models/UserPemission';
 import userLog from '../controller/userLog';
-import { getManager, getRepository } from 'typeorm';
+import { getManager } from 'typeorm';
 import Permission from '../models/Permission';
 
 import {UserRepo, UserPermissionRepo} from '../loaders/typeorm';

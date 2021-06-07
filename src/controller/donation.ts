@@ -1,5 +1,4 @@
 import logger from '../loaders/logger';
-import { getRepository } from 'typeorm';
 import Donation from '../models/Donation';
 import EventRunIncentive from '../models/EventRunIncentive';
 import EventRunBidwarOption from '../models/EventRunBidwarOption';

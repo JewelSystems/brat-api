@@ -1,4 +1,3 @@
-import { getRepository } from 'typeorm';
 import logger from '../loaders/logger';
 import Event from '../models/Event';
 import EventExtra from '../models/EventExtra';

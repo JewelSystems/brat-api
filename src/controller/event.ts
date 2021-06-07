@@ -1,6 +1,5 @@
 import logger from '../loaders/logger';
 import moment from 'moment'; 
-import { getRepository } from 'typeorm';
 import Event from '../models/Event';
 
 import {EventRepo} from '../loaders/typeorm';

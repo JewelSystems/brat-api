@@ -253,10 +253,6 @@ export default{
     logger.log("info", "Starting submit run with incentives update function");
     // Update submit run
     try{
-      //const runIncentivesRepository = getRepository(RunIncentive);
-      //const eventRunIncentivesRepository = getRepository(EventRunIncentive);
-      //const eventRunBidwarOptionRepository = getRepository(EventRunBidwarOption);
-
       let eventRunId = await this.update(id, reviewed, approved, waiting);
       const eventRunInfo = eventRunId.success;
       let approvedIncentives: any = {};

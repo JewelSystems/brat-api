@@ -1,6 +1,5 @@
 import logger from '../loaders/logger';
 import moment from 'moment';
-import { getRepository } from 'typeorm';
 import UserLog from '../models/UserLog';
 
 import {UserLogRepo} from '../loaders/typeorm';
