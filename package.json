@@ -4,7 +4,7 @@
   "description": "API for the BrAT dashboard",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/index.js",
+    "start": "node build/index.js",
     "dev": "nodemon src/index.ts",
     "build": "tsc -p .",
     "test": "mocha -r ts-node/register src/test/**/*.ts --exit",

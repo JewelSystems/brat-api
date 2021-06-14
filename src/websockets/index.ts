@@ -218,6 +218,8 @@ let loggedFunctionsBase = {
   
   createRun: run.create,
   createRunNGame: run.createRunNGame,
+
+  getEvents: event.getEvents,
   /*
   getRun: run.get,
 

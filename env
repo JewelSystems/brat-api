@@ -1,0 +1,14 @@
+SV_PORT = 3000
+SV_ADDRESS = 'http://localhost:'
+
+REDIS_HOST = 127.0.0.1
+REDIS_PORT = 6379
+REDIS_NAME = BrAT-ioredis
+
+DB_HOST = localhost
+DB_PORT = 3306
+DB_USER = root
+DB_PASS = root
+DB_NAME = 'brat'
+
+NODE_ENV = dev
