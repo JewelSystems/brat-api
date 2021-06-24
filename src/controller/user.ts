@@ -13,6 +13,19 @@ interface CtrlResponse{
   error?: string;
 }
 
+interface IUpdateObj{
+  first_name?: string
+  last_name?: string
+  email?: string
+  phone_number?: string
+  stream_link?: string
+  twitch?: string
+  twitter?: string
+  facebook?: string
+  instagram?: string
+  youtube?: string
+}
+
 export default {
   async checkUsername(username: string): Promise<User | undefined | never>{
     logger.log("info", "Starting check username function");
@@ -197,5 +210,41 @@ export default {
       logger.log("error", "DB Error: " + JSON.stringify(error));
       return {error: "Server error"};
     }
-  }
+  },
+
+  async updateUser(
+    id: number,
+    first_name?: string,
+    last_name?: string,
+    email?: string,
+    phone_number?: string,
+    stream_link?: string,
+    twitch?: string,
+    twitter?: string,
+    facebook?: string,
+    instagram?: string,
+    youtube?: string): Promise<CtrlResponse>{
+    logger.log("info", "Starting update user function");
+    // Get users
+    try{
+      let obj: IUpdateObj = {};
+      if(first_name) obj.first_name = first_name;
+      if(last_name) obj.last_name = last_name;
+      if(email) obj.email = email;
+      if(phone_number) obj.phone_number = phone_number;
+      if(stream_link) obj.stream_link = stream_link;
+      if(twitch) obj.twitch = twitch;
+      if(twitter) obj.twitter = twitter;
+      if(facebook) obj.facebook = facebook;
+      if(instagram) obj.instagram = instagram;
+      if(youtube) obj.youtube = youtube;
+      
+      await UserRepo.update({id}, obj);
+      return {success: id};
+    }catch(error){
+      logger.log("error", "DB Error: " + JSON.stringify(error));
+      return {error: "Server error"};
+    }
+  },
+
 };

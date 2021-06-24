@@ -6,6 +6,11 @@ let auth = (app: Application) => {
     let response = await API.login(req.body.username, req.body.password);
     res.status(response.status).send(response.body);
   });
+
+  app.post('/token', async (req: Request, res: Response) => {
+    let response = await API.checkTokenExist(req.body.token);
+    res.status(response.status).send(response.body);
+  });
 };
 
 export default auth;

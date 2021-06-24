@@ -139,6 +139,7 @@ let loggedFunctionsAdmin = {
   //getUser: user.get,
   getUsers: user.getUsers,
   getUserRuns: user.getUserRuns,
+  updateUser: user.updateUser,
   
   removePermission: userPermission.removePermission,
   addPermission: userPermission.addPermission,

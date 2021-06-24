@@ -1,4 +1,5 @@
 import Controller from '../controller/auth';
+import RedisClient from '../loaders/redis';
 
 interface IResponse {
   status: number;
@@ -58,5 +59,21 @@ export  default{
       return {"status": 403, "msg": response.error};
     }
     return {"status": 200, "msg": "authLogin", user: response.user, permissions: response.permissions};
-  }
+  },
+  
+  async checkTokenExist(token: string): Promise<IResponse>{
+    if (!token || !(await RedisClient.get(`user-${token}`))) {
+      return {
+        status: 404,
+        body: {
+          error: "Missing token"
+        }
+      };
+    }
+
+    return {
+      status: 200,
+      body: {}
+    };
+  },
 };

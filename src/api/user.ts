@@ -161,6 +161,42 @@ export default {
     }
     //Successful request
     return {"status": 200, "msg": "listUsers", data:[response.success]};
+  },
+
+  async updateUser(  
+    id: number,
+    first_name?: string,
+    last_name?: string,
+    email?: string,
+    phone_number?: string,
+    stream_link?: string,
+    twitch?: string,
+    twitter?: string,
+    facebook?: string,
+    instagram?: string,
+    youtube?: string): Promise<APIResponse>{
+    if(!id || (!first_name && !last_name && !email && !phone_number && !stream_link && !twitch && !twitter && !facebook && !instagram && !youtube)){
+      return {"status": 403, "msg": "Missing mandatory fields"};
+    }
+
+    let response = await Controller.updateUser(
+      id,
+      first_name,
+      last_name,
+      email,
+      phone_number,
+      stream_link,
+      twitch,
+      twitter,
+      facebook,
+      instagram,
+      youtube
+    );
+    if (response.error) {
+      return {"status": 403, "msg": response.error};
+    }
+    //Successful request
+    return {"status": 200, "msg": "updateUser", data:[response.success]};
   }
 
 };
